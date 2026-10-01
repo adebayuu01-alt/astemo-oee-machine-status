@@ -34,10 +34,14 @@ ChartJS.register(
   Legend
 );
 
-const SHIFT_OPTIONS = ['Shift 1', 'Shift 2', 'Shift 3'];
+import { LINE_OPTIONS, SHIFT_OPTIONS } from '../data/mockData';
 
 export default function DashboardPage() {
   const {
+    selectedLine,
+    setSelectedLine,
+    selectedShift,
+    setSelectedShift,
     secondsLeft,
     productData,
     oeeMetrics,
@@ -45,7 +49,6 @@ export default function DashboardPage() {
     productionGraph
   } = useRealtime();
 
-  const [selectedShift, setSelectedShift] = useState('Shift 1');
   const [dateRange, setDateRange] = useState(null);
   const [showTargetModal, setShowTargetModal] = useState(false);
   const [targetOee, setTargetOee] = useState(100);
@@ -287,7 +290,17 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Line Select - Height 38px matching Shift dropdown */}
+            <div className="w-28 sm:w-32">
+              <CustomDropdown
+                value={selectedLine}
+                onChange={setSelectedLine}
+                options={LINE_OPTIONS}
+                placeholder="Line 1"
+              />
+            </div>
+
             {/* Shift Select - Height 38px matching DateRangePicker */}
             <div className="w-28">
               <CustomDropdown

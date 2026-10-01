@@ -101,6 +101,12 @@ export const INITIAL_REGISTERS = [
     line: 'Line 2',
     machines: ['FANUC 1', 'FANUC 2', 'FANUC 3'],
     datetime: '06/09/2026 12:00'
+  },
+  {
+    id: 3,
+    line: 'Line 3',
+    machines: ['FANUC 1', 'FANUC 2', 'FANUC 3', 'FANUC 4'],
+    datetime: '08/09/2026 10:00'
   }
 ];
 
@@ -325,6 +331,9 @@ export const INITIAL_MACHINE_TIMELINE = [
   }
 ];
 
+export const LINE_OPTIONS = ['Line 1', 'Line 2', 'Line 3'];
+export const SHIFT_OPTIONS = ['Shift 1', 'Shift 2', 'Shift 3'];
+
 export const TOP_5_ALARMS_DATA = [
   { name: 'Coolant Temperature High', duration: '04:35:00', hours: 4.58 },
   { name: 'DC Link Undervoltage', duration: '04:12:00', hours: 4.22 },
@@ -337,5 +346,89 @@ export const PRODUCTION_GRAPH_DATA = {
   labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'],
   actual: [150000, 125000, 50000, 100000, 75000],
   plan: [150000, 150000, 150000, 150000, 100000]
+};
+
+export const SHIFT_DASHBOARD_DATA = {
+  'Shift 1': {
+    productData: {
+      productionTarget: 1450,
+      countingProduct: 1392,
+      okCount: 1364,
+      reworkCount: 28
+    },
+    oeeMetrics: {
+      actualOee: 88,
+      targetOee: 100,
+      availability: 92,
+      performance: 96,
+      quality: 99
+    },
+    top5Alarms: [
+      { name: 'Coolant Temperature High', duration: '04:35:00', hours: 4.58 },
+      { name: 'DC Link Undervoltage', duration: '04:12:00', hours: 4.22 },
+      { name: 'DSEthernet Communication Error', duration: '03:45:00', hours: 3.75 },
+      { name: 'Overtravel: +Z', duration: '02:50:00', hours: 2.83 },
+      { name: 'Lubricant Pressure Low', duration: '02:15:00', hours: 2.25 }
+    ],
+    productionGraph: {
+      labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'],
+      actual: [142000, 138000, 145000, 140000, 139200],
+      plan: [145000, 145000, 145000, 145000, 145000]
+    }
+  },
+  'Shift 2': {
+    productData: {
+      productionTarget: 1284,
+      countingProduct: 1180,
+      okCount: 1098,
+      reworkCount: 82
+    },
+    oeeMetrics: {
+      actualOee: 74,
+      targetOee: 100,
+      availability: 80,
+      performance: 88,
+      quality: 94
+    },
+    top5Alarms: [
+      { name: 'Chip Conveyor Jammed', duration: '03:48:00', hours: 3.80 },
+      { name: 'Spindle Motor Overload', duration: '03:10:00', hours: 3.17 },
+      { name: 'Hydraulic Pressure Drop', duration: '02:42:00', hours: 2.70 },
+      { name: 'Axis Servo Alarm', duration: '01:57:00', hours: 1.95 },
+      { name: 'Safety Door Interlock', duration: '01:24:00', hours: 1.40 }
+    ],
+    productionGraph: {
+      labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'],
+      actual: [118000, 122000, 105000, 115000, 118000],
+      plan: [125000, 125000, 125000, 125000, 125000]
+    }
+  },
+  'Shift 3': {
+    productData: {
+      productionTarget: 1050,
+      countingProduct: 920,
+      okCount: 828,
+      reworkCount: 92
+    },
+    oeeMetrics: {
+      actualOee: 62,
+      targetOee: 100,
+      availability: 66,
+      performance: 74,
+      quality: 89
+    },
+    top5Alarms: [
+      { name: 'Pneumatic Air Pressure Low', duration: '04:06:00', hours: 4.10 },
+      { name: 'Pallet Changer Fault', duration: '03:15:00', hours: 3.25 },
+      { name: 'Spindle Vibration High', duration: '02:36:00', hours: 2.60 },
+      { name: 'Emergency Stop Activated', duration: '02:06:00', hours: 2.10 },
+      { name: 'Material Feed Timeout', duration: '01:30:00', hours: 1.50 }
+    ],
+    productionGraph: {
+      labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'],
+      actual: [92000, 88000, 95000, 89000, 96000],
+      plan: [105000, 105000, 105000, 105000, 105000]
+    }
+  }
 };
 

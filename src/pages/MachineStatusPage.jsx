@@ -13,8 +13,7 @@ import AntDateRangePicker from '../components/AntDateRangePicker';
 import CustomDropdown from '../components/CustomDropdown';
 import AlarmHistoryPage from './AlarmHistoryPage';
 import { useRealtime } from '../context/RealtimeContext';
-
-const SHIFT_OPTIONS = ['Shift 1', 'Shift 2', 'Shift 3'];
+import { LINE_OPTIONS, SHIFT_OPTIONS } from '../data/mockData';
 
 // Shift configurations with default time boundaries and ticks
 const SHIFT_CONFIG = {
@@ -38,8 +37,8 @@ const SHIFT_CONFIG = {
   'Shift 2': {
     startH: 16,
     startM: 0,
-    endH: 23,
-    endM: 59,
+    endH: 24,
+    endM: 0,
     ticks: [
       { label: '16:00', left: '0%' },
       { label: '17:00', left: '12.5%' },
@@ -104,13 +103,28 @@ const TIMELINE_SEGMENTS_F1 = [
   { status: 'Stop', width: '1.2%', label: 'Stop', time: '16:00' }
 ];
 
-const BASE_MACHINES = [
-  { id: 1, name: 'Fannuc 1' },
-  { id: 2, name: 'Fannuc 2' },
-  { id: 3, name: 'Fannuc 3' },
-  { id: 4, name: 'Fannuc 4' },
-  { id: 5, name: 'Fannuc 5' }
-];
+const LINE_MACHINES = {
+  'Line 1': [
+    { id: 1, name: 'FANUC 1' },
+    { id: 2, name: 'FANUC 2' },
+    { id: 3, name: 'FANUC 3' },
+    { id: 4, name: 'FANUC 4' },
+    { id: 5, name: 'FANUC 5' }
+  ],
+  'Line 2': [
+    { id: 1, name: 'FANUC 1' },
+    { id: 2, name: 'FANUC 2' },
+    { id: 3, name: 'FANUC 3' }
+  ],
+  'Line 3': [
+    { id: 1, name: 'FANUC 1' },
+    { id: 2, name: 'FANUC 2' },
+    { id: 3, name: 'FANUC 3' },
+    { id: 4, name: 'FANUC 4' }
+  ]
+};
+
+const BASE_MACHINES = LINE_MACHINES['Line 1'];
 
 const ZOOM_LEVELS = [1, 1.25, 1.5, 2, 2.5, 3, 4, 5];
 
@@ -190,16 +204,17 @@ function getTimelineTicks(selectedShift, dateRange, zoom = 1) {
 }
 
 // Helper to generate realistic dummy timeline segments based on date range and machineId
-function generateDummyTimeline(startDate, endDate, machineId) {
+function generateDummyTimeline(startDate, endDate, machineId, seedOffset = 0) {
   const totalMinutes = Math.max(endDate.diff(startDate, 'minute'), 15);
-  const isMultiDay = !startDate.isSame(endDate, 'day') || totalMinutes > 1440;
+  const isMultiDay = totalMinutes > 1440;
   const timeFormat = isMultiDay ? 'DD/MM HH:mm' : 'HH:mm';
 
-  // Deterministic seed based on timestamps and machine ID
+  // Deterministic seed based on timestamps, machine ID and seedOffset
   let seed = Math.abs(
     (startDate.unix() % 100000) * 19 +
     (endDate.unix() % 100000) * 23 +
-    machineId * 53
+    machineId * 53 +
+    seedOffset * 97
   );
   const rand = () => {
     seed = (seed * 9301 + 49297) % 233280;
@@ -245,9 +260,8 @@ function generateDummyTimeline(startDate, endDate, machineId) {
 }
 
 export default function MachineStatusPage({ onNavigateAlarmHistory }) {
-  const { tick } = useRealtime();
+  const { tick, selectedLine, setSelectedLine, selectedShift, setSelectedShift } = useRealtime();
   const [currentView, setCurrentView] = useState('status'); // 'status' | 'alarm-history'
-  const [selectedShift, setSelectedShift] = useState('Shift 1');
   const [dateRange, setDateRange] = useState(null);
 
   const handleOpenAlarmHistory = () => {
@@ -414,21 +428,28 @@ export default function MachineStatusPage({ onNavigateAlarmHistory }) {
     }
   };
 
-  // Compute active machine timeline data dynamically based on dateRange, selectedShift, and realtime tick
+  // Compute active machine timeline data dynamically based on dateRange, selectedShift, selectedLine, and realtime tick
   const activeMachines = useMemo(() => {
-    return BASE_MACHINES.map((m) => {
+    const machines = LINE_MACHINES[selectedLine] || LINE_MACHINES['Line 1'];
+    const lineSeed = selectedLine === 'Line 2' ? 200 : selectedLine === 'Line 3' ? 350 : 50;
+    const shiftSeed = selectedShift === 'Shift 2' ? 500 : selectedShift === 'Shift 3' ? 800 : 100;
+
+    return machines.map((m) => {
       let baseSegs;
       // 1. If custom Date & Time range is selected by the user
       if (dateRange && dateRange[0] && dateRange[1]) {
-        baseSegs = generateDummyTimeline(dateRange[0], dateRange[1], m.id);
-      } else if (selectedShift === 'Shift 1' && m.id === 1) {
+        baseSegs = generateDummyTimeline(dateRange[0], dateRange[1], m.id, lineSeed + shiftSeed);
+      } else if (selectedShift === 'Shift 1' && selectedLine === 'Line 1' && m.id === 1) {
         baseSegs = TIMELINE_SEGMENTS_F1;
       } else {
         const cfg = SHIFT_CONFIG[selectedShift] || SHIFT_CONFIG['Shift 1'];
         const today = dayjs();
         const start = today.hour(cfg.startH).minute(cfg.startM).second(0);
-        const end = today.hour(cfg.endH).minute(cfg.endM).second(0);
-        baseSegs = generateDummyTimeline(start, end, m.id);
+        let end = today.hour(cfg.endH === 24 ? 0 : cfg.endH).minute(cfg.endM).second(0);
+        if (cfg.endH === 24 || end.isBefore(start)) {
+          end = end.add(1, 'day');
+        }
+        baseSegs = generateDummyTimeline(start, end, m.id, lineSeed + shiftSeed);
       }
 
       // Live animated timeline: the active segment slightly advances on each 10s tick
@@ -449,7 +470,7 @@ export default function MachineStatusPage({ onNavigateAlarmHistory }) {
       const formatStr = (dateRange && dateRange[0] && dateRange[1] && !dateRange[0].isSame(dateRange[1], 'day')) ? 'DD/MM HH:mm' : 'HH:mm';
       const subtitle = (dateRange && dateRange[0] && dateRange[1])
         ? `Status of ${m.name.toLowerCase()} (${dateRange[0].format(formatStr)} - ${dateRange[1].format(formatStr)})`
-        : `Status of ${m.name.toLowerCase()}`;
+        : `Status of ${m.name.toLowerCase()} (${selectedLine} - ${selectedShift})`;
 
       return {
         id: m.id,
@@ -458,7 +479,7 @@ export default function MachineStatusPage({ onNavigateAlarmHistory }) {
         segments: segs
       };
     });
-  }, [dateRange, selectedShift, tick]);
+  }, [dateRange, selectedLine, selectedShift, tick]);
 
   if (currentView === 'alarm-history') {
     return <AlarmHistoryPage onBack={() => setCurrentView('status')} />;
@@ -476,7 +497,19 @@ export default function MachineStatusPage({ onNavigateAlarmHistory }) {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Line Select - Height 38px matching Shift dropdown */}
+            <div className="w-28 sm:w-32">
+              <CustomDropdown
+                value={selectedLine}
+                onChange={(val) => {
+                  setSelectedLine(val);
+                }}
+                options={LINE_OPTIONS}
+                placeholder="Line 1"
+              />
+            </div>
+
             {/* Shift Select - Height 38px matching other components */}
             <div className="w-28">
               <CustomDropdown
