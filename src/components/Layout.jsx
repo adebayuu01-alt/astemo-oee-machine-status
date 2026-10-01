@@ -90,7 +90,7 @@ export default function Layout({
             <img
               src={astemoBrand}
               alt="Hitachi Astemo - OEE Machine Status"
-              className="h-8 object-contain"
+              className="h-[40px] w-auto object-contain"
             />
           </div>
 
