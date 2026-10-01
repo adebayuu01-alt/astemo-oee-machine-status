@@ -48,6 +48,7 @@ export default function App() {
 
   const handleNavigate = (menu) => {
     if (menu === 'notification') return; // Notification hidden for now
+    if (menu === 'user-management' || menu === 'role-management') return; // Hidden for 1 platform auth
     // Suep (Operator) can only view Dashboard, Machine Status, Alarm History
     const operatorAllowed = ['dashboard', 'machine-status', 'alarm-history'];
     if (isOperator && !operatorAllowed.includes(menu)) {
@@ -99,8 +100,8 @@ export default function App() {
           />
         ) */}
 
-        {/* MANAGEMENT PAGES (Superadmin & Admin) */}
-        {!isOperator && activeMenu === 'user-management' && (
+        {/* MANAGEMENT PAGES (Superadmin & Admin - Hidden for 1 platform auth) */}
+        {/* {!isOperator && activeMenu === 'user-management' && (
           <UserManagementPage
             users={users}
             onUpdateUsers={setUsers}
@@ -113,7 +114,7 @@ export default function App() {
             roles={roles}
             onUpdateRoles={setRoles}
           />
-        )}
+        )} */}
 
         {/* DATABASE PAGES (Superadmin & Admin) */}
         {!isOperator && activeMenu === 'master-data-line' && (

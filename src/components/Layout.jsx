@@ -179,8 +179,8 @@ export default function Layout({
               </div>
             </div>
 
-            {/* MANAGEMENT (Superadmin & Admin - Hidden for pure Operator Suep) */}
-            {!isOperator && (
+            {/* MANAGEMENT (User Management & Role Management - Hidden for 1 platform auth) */}
+            {/* {!isOperator && (
               <div>
                 {sidebarOpen && (
                   <p className="text-[11px] font-semibold tracking-wider text-gray-400 uppercase mb-2 px-2">
@@ -215,7 +215,7 @@ export default function Layout({
                   </button>
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* DATABASE (Superadmin & Admin) */}
             {!isOperator && (
