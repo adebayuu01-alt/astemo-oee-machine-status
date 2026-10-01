@@ -750,7 +750,7 @@ export default function HistoryTestingPage({
             <SkeletonTable rows={10} cols={4} />
           ) : (
             <div className="overflow-x-auto rounded-lg border border-[#D0D5DD]">
-              <table className="w-full text-left border-collapse text-sm">
+              <table className="w-full text-left border-collapse text-sm font-sans">
                 <thead className="bg-[#F2F2F7] border-b border-[#D0D5DD]">
                   <tr className="text-[#23262B] font-semibold">
                     <th className="py-3.5 px-4 w-16">
@@ -787,16 +787,16 @@ export default function HistoryTestingPage({
                         key={item.id}
                         className="hover:bg-gray-50/80 transition-colors"
                       >
-                        <td className="py-3.5 px-4 text-gray-600 font-medium">
+                        <td className="py-3.5 px-4 text-gray-600 font-medium leading-5">
                           {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
-                        <td className="py-3.5 px-4 text-gray-800 font-medium">
+                        <td className="py-3.5 px-4 text-gray-800 font-medium leading-5">
                           {item.model}
                         </td>
-                        <td className="py-3.5 px-4 text-gray-600">
+                        <td className="py-3.5 px-4 text-gray-600 leading-5">
                           {item.datetime}
                         </td>
-                        <td className="py-3.5 px-4 text-center">
+                        <td className="py-3.5 px-4 text-center leading-5">
                           <div className="flex items-center justify-center gap-2">
                             {/* View Button */}
                             <button

@@ -19,7 +19,6 @@ const SYSTEM_MENUS = [
   'Dashboard',
   'Machine Status',
   'Planning Production',
-  'Notification',
   'User Management',
   'Role Management',
   'Master Data',
@@ -45,6 +44,7 @@ export default function RoleManagementPage({ roles, onUpdateRoles }) {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [deleteId, setDeleteId] = useState(null);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -154,10 +154,11 @@ export default function RoleManagementPage({ roles, onUpdateRoles }) {
     setRoleName('');
   };
 
-  const handleDeleteRole = (id) => {
-    if (window.confirm('Are you sure you want to delete this role?')) {
-      onUpdateRoles(roles.filter((r) => r.id !== id));
+  const handleDeleteConfirm = () => {
+    if (deleteId) {
+      onUpdateRoles(roles.filter((r) => r.id !== deleteId));
       setToast({ type: 'success', title: 'Deleted', message: 'Role deleted successfully.' });
+      setDeleteId(null);
     }
   };
 
@@ -219,7 +220,7 @@ export default function RoleManagementPage({ roles, onUpdateRoles }) {
             <SkeletonTable rows={3} cols={6} />
           ) : (
             <div className="overflow-x-auto rounded-lg border border-[#D0D5DD]">
-              <table className="w-full text-left border-collapse text-sm">
+              <table className="w-full text-left border-collapse text-sm font-sans">
                 <thead className="bg-[#F2F2F7] border-b border-[#D0D5DD]">
                   <tr className="text-[#23262B] font-semibold">
                     <th className="py-3.5 px-4 w-16">
@@ -258,13 +259,13 @@ export default function RoleManagementPage({ roles, onUpdateRoles }) {
                 <tbody className="divide-y divide-[#E4E7EC] bg-white">
                   {paginatedRoles.map((r, index) => (
                     <tr key={r.id} className="hover:bg-gray-50/80 transition-colors">
-                      <td className="py-4 px-4 text-gray-600 font-medium align-top">
+                      <td className="py-3.5 px-4 text-gray-600 font-medium align-top leading-5">
                         {(currentPage - 1) * itemsPerPage + index + 1}
                       </td>
-                      <td className="py-4 px-4 text-gray-800 font-medium align-top">
+                      <td className="py-3.5 px-4 text-gray-800 font-medium align-top leading-5">
                         {r.role}
                       </td>
-                      <td className="py-4 px-4 text-gray-700 align-top">
+                      <td className="py-3.5 px-4 text-gray-700 align-top leading-5">
                         <ul className="space-y-1 text-xs">
                           {r.menus.map((m, i) => (
                             <li key={i} className="flex items-center gap-1.5">
@@ -274,7 +275,7 @@ export default function RoleManagementPage({ roles, onUpdateRoles }) {
                           ))}
                         </ul>
                       </td>
-                      <td className="py-4 px-4 text-gray-600 align-top">
+                      <td className="py-3.5 px-4 text-gray-600 align-top leading-5">
                         <ul className="space-y-1 text-xs">
                           {r.permissions.map((p, i) => (
                             <li key={i} className="flex items-center gap-1.5">
@@ -284,10 +285,10 @@ export default function RoleManagementPage({ roles, onUpdateRoles }) {
                           ))}
                         </ul>
                       </td>
-                      <td className="py-4 px-4 text-gray-600 align-top">
+                      <td className="py-3.5 px-4 text-gray-600 align-top leading-5">
                         {r.datetime}
                       </td>
-                      <td className="py-4 px-4 text-right align-top">
+                      <td className="py-3.5 px-4 text-right align-top leading-5">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => {
@@ -301,7 +302,7 @@ export default function RoleManagementPage({ roles, onUpdateRoles }) {
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDeleteRole(r.id)}
+                            onClick={() => setDeleteId(r.id)}
                             className="p-1.5 border border-red-200 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete Role"
                           >
@@ -490,6 +491,30 @@ export default function RoleManagementPage({ roles, onUpdateRoles }) {
               </button>
             </div>
           </form>
+        </div>
+      </ModalPortal>
+
+      {/* Delete Confirmation Modal */}
+      <ModalPortal isOpen={!!deleteId} onClose={() => setDeleteId(null)}>
+        <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
+          <h3 className="text-base font-bold text-gray-900">Delete Role?</h3>
+          <p className="text-xs text-gray-500">
+            Are you sure you want to delete this role? This action cannot be undone.
+          </p>
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <button
+              onClick={() => setDeleteId(null)}
+              className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteConfirm}
+              className="px-6 py-2.5 bg-[#F04438] hover:bg-[#D92D20] text-white rounded-lg text-sm font-medium shadow-sm transition-colors"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </ModalPortal>
 

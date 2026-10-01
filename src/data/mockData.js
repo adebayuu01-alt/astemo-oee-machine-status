@@ -5,43 +5,11 @@
 export const INITIAL_USERS = [
   {
     id: 1,
-    idCard: 'AST-SA-001',
-    name: 'Kevin Pratama',
-    username: 'kevin_astemo',
+    name: 'Affan Astemo',
+    username: 'affan_astemo',
     role: 'Superadmin',
-    datetime: '06/09/2026 12:00',
-    password: 'kevin12345',
-    passwordMasked: '*****************'
-  },
-  {
-    id: 2,
-    idCard: 'AST-OP-002',
-    name: 'Suep Suryadi',
-    username: 'suep_astemo',
-    role: 'Operator',
-    datetime: '06/09/2026 12:00',
-    password: 'suep12345',
-    passwordMasked: '*****************'
-  },
-  {
-    id: 3,
-    idCard: 'AST-OP-003',
-    name: 'Budi CNC',
-    username: 'budi_cnc',
-    role: 'Operator',
-    datetime: '07/09/2026 08:30',
-    password: 'budi12345',
-    passwordMasked: '*****************'
-  },
-  {
-    id: 4,
-    idCard: 'AST-ENG-004',
-    name: 'Andi Maintenance',
-    username: 'andi_maint',
-    role: 'Engineer',
-    datetime: '08/09/2026 14:15',
-    password: 'andi12345',
-    passwordMasked: '*****************'
+    password: 'affan12345',
+    datetime: '06/09/2026 12:00'
   }
 ];
 
@@ -53,14 +21,12 @@ export const INITIAL_ROLES = [
       'Dashboard',
       'Machine Status',
       'Planning Production',
-      'Notification',
       'User Management',
       'Role Management',
       'Master Data',
       'Register'
     ],
     permissions: [
-      'Create, Read, Update, Delete',
       'Create, Read, Update, Delete',
       'Create, Read, Update, Delete',
       'Create, Read, Update, Delete',
@@ -78,14 +44,12 @@ export const INITIAL_ROLES = [
       'Dashboard',
       'Machine Status',
       'Planning Production',
-      'Notification',
       'User Management',
       'Role Management',
       'Master Data',
       'Register'
     ],
     permissions: [
-      'Create, Read, Update, Delete',
       'Create, Read, Update, Delete',
       'Create, Read, Update, Delete',
       'Create, Read, Update, Delete',
@@ -99,8 +63,8 @@ export const INITIAL_ROLES = [
   {
     id: 3,
     role: 'Operator',
-    menus: ['Dashboard', 'Machine Status', 'Notification'],
-    permissions: ['Read', 'Read', 'Read'],
+    menus: ['Dashboard', 'Machine Status'],
+    permissions: ['Read', 'Read'],
     datetime: '07/09/2026 09:00'
   }
 ];

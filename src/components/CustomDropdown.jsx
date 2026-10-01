@@ -9,7 +9,8 @@ export default function CustomDropdown({
   includeAllOption = false,
   allOptionLabel = 'All Model',
   disabled = false,
-  className = ''
+  className = '',
+  buttonClassName = ''
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -25,7 +26,7 @@ export default function CustomDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Format options: support strings or objects { label, value }
+  // Format options: support strings or objects { label, value, line, machine, model, name }
   const formattedOptions = [];
   if (includeAllOption) {
     formattedOptions.push({ label: allOptionLabel, value: '' });
@@ -34,9 +35,11 @@ export default function CustomDropdown({
     if (typeof opt === 'string') {
       formattedOptions.push({ label: opt, value: opt });
     } else if (opt && typeof opt === 'object') {
+      const label = opt.label || opt.line || opt.machine || opt.model || opt.name || String(opt.value);
+      const val = opt.value !== undefined ? opt.value : (opt.line || opt.machine || opt.model || opt.name);
       formattedOptions.push({
-        label: opt.label || opt.model || opt.name,
-        value: opt.value !== undefined ? opt.value : (opt.model || opt.name)
+        label,
+        value: val
       });
     }
   });
@@ -47,14 +50,16 @@ export default function CustomDropdown({
   return (
     <div
       ref={dropdownRef}
-      className={`relative inline-block w-full text-left select-none ${isOpen ? 'z-30' : ''} ${className}`}
+      className={`relative inline-block w-full text-left select-none ${isOpen ? 'z-40' : ''} ${className}`}
     >
-      {/* Trigger Box matching DateRangePicker height 38px */}
+      {/* Trigger Box */}
       <button
         type="button"
         disabled={disabled}
         onClick={() => !disabled && setIsOpen(!isOpen)}
-        className={`w-full h-[38px] flex items-center justify-between px-3.5 bg-white border border-[#D0D5DD] rounded-lg text-sm text-[#1E232F] font-normal transition-colors focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+        className={`w-full flex items-center justify-between px-3.5 bg-white border border-[#D0D5DD] text-sm text-[#1E232F] font-normal transition-colors focus:outline-none focus:border-[#00A854] ${
+          buttonClassName || 'h-[38px] rounded-lg'
+        } ${
           disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'cursor-pointer hover:border-gray-400'
         }`}
       >

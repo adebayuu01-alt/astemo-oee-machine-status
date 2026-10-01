@@ -33,11 +33,30 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
   // Add / Edit User Form State
   const [username, setUsername] = useState('');
   const [role, setRole] = useState('Admin');
-  const [idCard, setIdCard] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Table Password Visibility
+  const [visiblePasswordIds, setVisiblePasswordIds] = useState([]);
+  const togglePasswordVisibility = (userId) => {
+    setVisiblePasswordIds((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+    );
+  };
+
+  // Reset Password Modal State
+  const [showResetModal, setShowResetModal] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [showResetConfirmPassword, setShowResetConfirmPassword] = useState(false);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [deleteId, setDeleteId] = useState(null);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -49,8 +68,7 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
   const filteredUsers = users.filter(
     (u) =>
       u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (u.idCard && u.idCard.toLowerCase().includes(searchQuery.toLowerCase()))
+      u.role.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const totalEntries = filteredUsers.length;
@@ -60,6 +78,28 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
     currentPage * itemsPerPage
   );
 
+  const handleOpenAdd = () => {
+    setEditingUser(null);
+    setUsername('');
+    setRole('Admin');
+    setPassword('');
+    setConfirmPassword('');
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+    setShowAddModal(true);
+  };
+
+  const handleOpenEdit = (u) => {
+    setEditingUser(u);
+    setUsername(u.username);
+    setRole(u.role);
+    setPassword(u.password || '');
+    setConfirmPassword(u.password || '');
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+    setShowAddModal(true);
+  };
+
   // Add / Edit User Save
   const handleSaveUser = (e) => {
     e.preventDefault();
@@ -67,14 +107,22 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
       setToast({ type: 'error', title: 'Error', message: 'Username is required.' });
       return;
     }
-    if (!idCard.trim()) {
-      setToast({ type: 'error', title: 'Error', message: 'ID Card is required.' });
+    if (!role) {
+      setToast({ type: 'error', title: 'Error', message: 'Role is required.' });
+      return;
+    }
+    if (!password) {
+      setToast({ type: 'error', title: 'Error', message: 'Password is required.' });
+      return;
+    }
+    if (password !== confirmPassword) {
+      setToast({ type: 'error', title: 'Error', message: 'Password and Confirm Password do not match.' });
       return;
     }
 
     if (editingUser) {
       const updated = users.map((u) =>
-        u.id === editingUser.id ? { ...u, username: username.trim(), role, idCard: idCard.trim() } : u
+        u.id === editingUser.id ? { ...u, username: username.trim(), role, password } : u
       );
       onUpdateUsers(updated);
       setToast({
@@ -85,29 +133,32 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
     } else {
       const newUser = {
         id: Date.now(),
-        idCard: idCard.trim(),
         username: username.trim(),
         role,
+        password,
         datetime: new Date().toLocaleDateString('en-GB') + ' 12:00'
       };
       onUpdateUsers([...users, newUser]);
       setToast({
         type: 'success',
         title: 'User Added Successfully',
-        message: `User ${username} with ID Card ${idCard} has been added to the system.`
+        message: `User ${username} has been added to the system.`
       });
     }
 
     setShowAddModal(false);
     setEditingUser(null);
     setUsername('');
-    setIdCard('');
+    setRole('Admin');
+    setPassword('');
+    setConfirmPassword('');
   };
 
-  const handleDeleteUser = (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      onUpdateUsers(users.filter((u) => u.id !== id));
+  const handleDeleteConfirm = () => {
+    if (deleteId) {
+      onUpdateUsers(users.filter((u) => u.id !== deleteId));
       setToast({ type: 'success', title: 'Deleted', message: 'User deleted successfully.' });
+      setDeleteId(null);
     }
   };
 
@@ -135,6 +186,8 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
     setShowResetModal(null);
     setNewPassword('');
     setConfirmNewPassword('');
+    setShowResetPassword(false);
+    setShowResetConfirmPassword(false);
   };
 
   return (
@@ -177,14 +230,8 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
               />
 
               <button
-                onClick={() => {
-                  setEditingUser(null);
-                  setUsername('');
-                  setRole('Admin');
-                  setIdCard('');
-                  setShowAddModal(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                onClick={handleOpenAdd}
+                className="flex items-center gap-2 px-4 py-2 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Data</span>
@@ -197,7 +244,7 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
             <SkeletonTable rows={4} cols={6} />
           ) : (
             <div className="overflow-x-auto rounded-lg border border-[#D0D5DD]">
-              <table className="w-full text-left border-collapse text-sm">
+              <table className="w-full text-left border-collapse text-sm font-sans">
                 <thead className="bg-[#F2F2F7] border-b border-[#D0D5DD]">
                   <tr className="text-[#23262B] font-semibold">
                     <th className="py-3.5 px-4 w-16">
@@ -220,7 +267,7 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
                     </th>
                     <th className="py-3.5 px-4">
                       <div className="flex items-center gap-1.5 cursor-pointer select-none">
-                        <span>ID Card</span>
+                        <span>Password</span>
                         <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
                       </div>
                     </th>
@@ -236,35 +283,57 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
                 <tbody className="divide-y divide-[#E4E7EC] bg-white">
                   {paginatedUsers.map((u, index) => (
                     <tr key={u.id} className="hover:bg-gray-50/80 transition-colors">
-                      <td className="py-3.5 px-4 text-gray-600 font-medium">
+                      <td className="py-3.5 px-4 text-gray-600 font-medium leading-5">
                         {(currentPage - 1) * itemsPerPage + index + 1}
                       </td>
-                      <td className="py-3.5 px-4 text-gray-800 font-medium">
+                      <td className="py-3.5 px-4 text-gray-800 font-medium leading-5">
                         {u.username}
                       </td>
-                      <td className="py-3.5 px-4 text-gray-600">{u.role}</td>
-                      <td className="py-3.5 px-4 text-gray-800 font-medium">
-                        {u.idCard || '-'}
+                      <td className="py-3.5 px-4 text-gray-600 leading-5">{u.role}</td>
+                      <td className="py-3.5 px-4 text-gray-800 font-medium leading-5">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-xs tracking-wider select-none text-gray-700">
+                            {visiblePasswordIds.includes(u.id) ? (u.password || 'affan12345') : '**************'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => togglePasswordVisibility(u.id)}
+                            className="p-1 border border-blue-400 text-blue-500 hover:bg-blue-50 rounded-md transition-colors cursor-pointer"
+                            title={visiblePasswordIds.includes(u.id) ? "Hide Password" : "Show Password"}
+                          >
+                            {visiblePasswordIds.includes(u.id) ? (
+                              <EyeOff className="w-3.5 h-3.5" />
+                            ) : (
+                              <Eye className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowResetModal(u);
+                              setNewPassword('');
+                              setConfirmNewPassword('');
+                            }}
+                            className="p-1 border border-red-300 text-red-500 hover:bg-red-50 rounded-md transition-colors cursor-pointer"
+                            title="Reset Password"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
-                      <td className="py-3.5 px-4 text-gray-600">{u.datetime}</td>
-                      <td className="py-3.5 px-4 text-center">
+                      <td className="py-3.5 px-4 text-gray-600 leading-5">{u.datetime}</td>
+                      <td className="py-3.5 px-4 text-center leading-5">
                         <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => {
-                              setEditingUser(u);
-                              setUsername(u.username);
-                              setRole(u.role);
-                              setIdCard(u.idCard || '');
-                              setShowAddModal(true);
-                            }}
-                            className="p-1.5 border border-amber-300 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"
+                            onClick={() => handleOpenEdit(u)}
+                            className="p-1.5 border border-amber-300 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
                             title="Edit User"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDeleteUser(u.id)}
-                            className="p-1.5 border border-red-200 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            onClick={() => setDeleteId(u.id)}
+                            className="p-1.5 border border-red-200 text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                             title="Delete User"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -354,8 +423,9 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
           </div>
 
           <form onSubmit={handleSaveUser} className="space-y-4">
+            {/* Username */}
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-bold text-gray-900 mb-1.5">
                 Username
               </label>
               <input
@@ -363,12 +433,14 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Input Username"
-                className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full h-11 px-3.5 bg-white border border-[#D0D5DD] rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#00A854]"
+                required
               />
             </div>
 
+            {/* Role */}
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-bold text-gray-900 mb-1.5">
                 Role
               </label>
               <CustomDropdown
@@ -376,40 +448,202 @@ export default function UserManagementPage({ users, onUpdateUsers, roles = [] })
                 onChange={(val) => setRole(val)}
                 options={roleOptions}
                 placeholder="Select Role"
-                className="w-full"
+                buttonClassName="h-11 rounded-xl"
               />
             </div>
 
+            {/* Password */}
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                ID Card
+              <label className="block text-sm font-bold text-gray-900 mb-1.5">
+                Password
               </label>
-              <input
-                type="text"
-                required
-                value={idCard}
-                onChange={(e) => setIdCard(e.target.value)}
-                placeholder="Input ID Card (e.g. AST-OP-005)"
-                className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Input Password"
+                  className="w-full h-11 pl-3.5 pr-10 bg-white border border-[#D0D5DD] rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#00A854]"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-0.5 cursor-pointer"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-bold text-gray-900 mb-1.5">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Input Password"
+                  className="w-full h-11 pl-3.5 pr-10 bg-white border border-[#D0D5DD] rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#00A854]"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-0.5 cursor-pointer"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-3">
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium"
+                className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-2.5 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-sm font-medium shadow-sm"
+                className="px-6 py-2.5 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-sm font-medium shadow-sm transition-colors cursor-pointer"
               >
                 Save
               </button>
             </div>
           </form>
+        </div>
+      </ModalPortal>
+
+      {/* Reset Password Modal */}
+      {showResetModal && (
+        <ModalPortal isOpen={!!showResetModal} onClose={() => setShowResetModal(null)}>
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-start justify-between border-b border-gray-100 pb-3">
+              <div>
+                <h3 className="text-base font-bold text-gray-900">
+                  Reset Password ({showResetModal.username})
+                </h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  This field is for desc terms of service
+                </p>
+              </div>
+              <button
+                onClick={() => setShowResetModal(null)}
+                className="text-gray-400 hover:text-gray-600 p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-900 mb-1.5">
+                  New Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showResetPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Input New Password"
+                    className="w-full h-11 pl-3.5 pr-10 bg-white border border-[#D0D5DD] rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#00A854]"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowResetPassword(!showResetPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-0.5 cursor-pointer"
+                  >
+                    {showResetPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-900 mb-1.5">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showResetConfirmPassword ? 'text' : 'password'}
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    placeholder="Input Confirm Password"
+                    className="w-full h-11 pl-3.5 pr-10 bg-white border border-[#D0D5DD] rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#00A854]"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowResetConfirmPassword(!showResetConfirmPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-0.5 cursor-pointer"
+                  >
+                    {showResetConfirmPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowResetModal(null)}
+                  className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-sm font-medium shadow-sm transition-colors cursor-pointer"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </ModalPortal>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      <ModalPortal isOpen={!!deleteId} onClose={() => setDeleteId(null)}>
+        <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
+          <h3 className="text-base font-bold text-gray-900">Delete User?</h3>
+          <p className="text-xs text-gray-500">
+            Are you sure you want to delete this user? This action cannot be undone.
+          </p>
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <button
+              onClick={() => setDeleteId(null)}
+              className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteConfirm}
+              className="px-6 py-2.5 bg-[#F04438] hover:bg-[#D92D20] text-white rounded-lg text-sm font-medium shadow-sm transition-colors"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </ModalPortal>
 

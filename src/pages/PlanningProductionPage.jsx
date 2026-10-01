@@ -187,7 +187,7 @@ export default function PlanningProductionPage() {
 
   return (
     <>
-      <div className="space-y-5 font-sans">
+      <div className="space-y-4 font-sans">
         {/* Top Header Card matching reference screenshot */}
         <div className="bg-white rounded-xl border border-[#E4E7EC] p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm flex-shrink-0">
           <div>
@@ -199,12 +199,12 @@ export default function PlanningProductionPage() {
         </div>
 
         {/* Main Content Card matching reference screenshot */}
-        <div className="bg-white rounded-xl border border-[#E4E7EC] p-5 shadow-sm space-y-4">
+        <div className="bg-white rounded-xl border border-[#E4E7EC] p-4 shadow-sm space-y-5">
           {/* Action Toolbar matching reference screenshot */}
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             {/* Search Input on the left */}
-            <div className="relative w-64 sm:w-72">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <div className="relative w-80">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
@@ -213,13 +213,13 @@ export default function PlanningProductionPage() {
                   setCurrentPage(1);
                 }}
                 placeholder="Search"
-                className="w-full pl-9 pr-8 py-2 bg-white border border-[#D0D5DD] rounded-lg text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#00A854] transition-colors"
+                className="w-full pl-10 pr-9 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-emerald-500"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -234,15 +234,12 @@ export default function PlanningProductionPage() {
                   setDateRange(dates);
                   setCurrentPage(1);
                 }}
-                format="DD/MM/YYYY"
-                placeholder={['Start date', 'End date']}
-                className="w-[260px] sm:w-[280px]"
               />
 
               <button
                 type="button"
                 onClick={() => setShowUploadModal(true)}
-                className="h-[38px] px-3.5 bg-white border border-[#D0D5DD] hover:bg-gray-50 text-gray-700 rounded-lg text-xs font-medium transition-colors shadow-xs flex items-center gap-2 cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors shadow-xs"
               >
                 <Upload className="w-4 h-4 text-gray-500" />
                 <span>Upload Data</span>
@@ -251,7 +248,7 @@ export default function PlanningProductionPage() {
               <button
                 type="button"
                 onClick={handleOpenAdd}
-                className="h-[38px] px-4 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-xs font-semibold transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
               >
                 <Plus className="w-4 h-4 text-white" />
                 <span>Add Data</span>
@@ -260,13 +257,13 @@ export default function PlanningProductionPage() {
           </div>
 
           {/* Table matching reference screenshot */}
-          <div className="overflow-x-auto rounded-lg border border-[#EAECF0]">
-            <table className="w-full text-left border-collapse text-xs font-sans">
-              <thead className="bg-[#F8F9FC] border-b border-[#EAECF0]">
-                <tr className="text-gray-600 font-semibold select-none">
+          <div className="overflow-x-auto rounded-lg border border-[#D0D5DD]">
+            <table className="w-full text-left border-collapse text-sm font-sans">
+              <thead className="bg-[#F2F2F7] border-b border-[#D0D5DD]">
+                <tr className="text-[#23262B] font-semibold text-sm select-none">
                   <th
                     onClick={() => handleSort('no')}
-                    className="py-3 px-3.5 w-12 cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="py-3.5 px-4 w-12 cursor-pointer hover:bg-gray-200/50 transition-colors"
                   >
                     <div className="flex items-center gap-1.5">
                       <span>No</span>
@@ -275,7 +272,7 @@ export default function PlanningProductionPage() {
                   </th>
                   <th
                     onClick={() => handleSort('period')}
-                    className="py-3 px-3.5 min-w-[170px] cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="py-3.5 px-4 min-w-[170px] cursor-pointer hover:bg-gray-200/50 transition-colors"
                   >
                     <div className="flex items-center gap-1.5">
                       <span>Period</span>
@@ -284,7 +281,7 @@ export default function PlanningProductionPage() {
                   </th>
                   <th
                     onClick={() => handleSort('shift1')}
-                    className="py-3 px-3.5 min-w-[210px] cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="py-3.5 px-4 min-w-[210px] cursor-pointer hover:bg-gray-200/50 transition-colors"
                   >
                     <div className="flex items-center gap-1.5">
                       <span>Shift 1</span>
@@ -293,7 +290,7 @@ export default function PlanningProductionPage() {
                   </th>
                   <th
                     onClick={() => handleSort('qty1')}
-                    className="py-3 px-3.5 w-24 cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="py-3.5 px-4 w-24 cursor-pointer hover:bg-gray-200/50 transition-colors"
                   >
                     <div className="flex items-center gap-1.5">
                       <span>Qty</span>
@@ -302,7 +299,7 @@ export default function PlanningProductionPage() {
                   </th>
                   <th
                     onClick={() => handleSort('shift2')}
-                    className="py-3 px-3.5 min-w-[210px] cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="py-3.5 px-4 min-w-[210px] cursor-pointer hover:bg-gray-200/50 transition-colors"
                   >
                     <div className="flex items-center gap-1.5">
                       <span>Shift 2</span>
@@ -311,7 +308,7 @@ export default function PlanningProductionPage() {
                   </th>
                   <th
                     onClick={() => handleSort('qty2')}
-                    className="py-3 px-3.5 w-24 cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="py-3.5 px-4 w-24 cursor-pointer hover:bg-gray-200/50 transition-colors"
                   >
                     <div className="flex items-center gap-1.5">
                       <span>Qty</span>
@@ -320,7 +317,7 @@ export default function PlanningProductionPage() {
                   </th>
                   <th
                     onClick={() => handleSort('shift3')}
-                    className="py-3 px-3.5 min-w-[210px] cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="py-3.5 px-4 min-w-[210px] cursor-pointer hover:bg-gray-200/50 transition-colors"
                   >
                     <div className="flex items-center gap-1.5">
                       <span>Shift 3</span>
@@ -329,17 +326,17 @@ export default function PlanningProductionPage() {
                   </th>
                   <th
                     onClick={() => handleSort('qty3')}
-                    className="py-3 px-3.5 w-24 cursor-pointer hover:bg-gray-100 transition-colors"
+                    className="py-3.5 px-4 w-24 cursor-pointer hover:bg-gray-200/50 transition-colors"
                   >
                     <div className="flex items-center gap-1.5">
                       <span>Qty</span>
                       <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
                     </div>
                   </th>
-                  <th className="py-3 px-3.5 text-center w-24">Action</th>
+                  <th className="py-3.5 px-4 text-center w-24">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EAECF0] bg-white text-gray-800">
+              <tbody className="divide-y divide-[#E4E7EC] bg-white text-gray-800">
                 {paginatedPlans.length === 0 ? (
                   <tr>
                     <td colSpan={9} className="py-12 text-center text-gray-400">
@@ -348,16 +345,16 @@ export default function PlanningProductionPage() {
                   </tr>
                 ) : (
                   paginatedPlans.map((item, idx) => (
-                    <tr key={item.id} className="hover:bg-gray-50/70 transition-colors">
-                      <td className="py-4 px-3.5 font-medium text-gray-700 align-middle">
+                    <tr key={item.id} className="hover:bg-gray-50/80 transition-colors">
+                      <td className="py-3.5 px-4 font-medium text-gray-600 align-middle leading-5">
                         {startIndex + idx + 1}
                       </td>
-                      <td className="py-4 px-3.5 font-medium text-gray-800 align-middle leading-relaxed max-w-[170px]">
+                      <td className="py-3.5 px-4 font-medium text-gray-800 align-middle leading-5 max-w-[170px]">
                         {item.period}
                       </td>
 
                       {/* Shift 1 */}
-                      <td className="py-4 px-3.5 align-middle">
+                      <td className="py-3.5 px-4 align-middle leading-5">
                         <div className="space-y-1.5">
                           {item.shift1Items.map((s, i) => (
                             <div key={i} className="flex items-center gap-2">
@@ -367,7 +364,7 @@ export default function PlanningProductionPage() {
                           ))}
                         </div>
                       </td>
-                      <td className="py-4 px-3.5 align-middle">
+                      <td className="py-3.5 px-4 align-middle leading-5">
                         <div className="space-y-1.5">
                           {item.shift1Items.map((s, i) => (
                             <div key={i} className="flex items-center gap-2">
@@ -379,7 +376,7 @@ export default function PlanningProductionPage() {
                       </td>
 
                       {/* Shift 2 */}
-                      <td className="py-4 px-3.5 align-middle">
+                      <td className="py-3.5 px-4 align-middle leading-5">
                         <div className="space-y-1.5">
                           {item.shift2Items.map((s, i) => (
                             <div key={i} className="flex items-center gap-2">
@@ -389,7 +386,7 @@ export default function PlanningProductionPage() {
                           ))}
                         </div>
                       </td>
-                      <td className="py-4 px-3.5 align-middle">
+                      <td className="py-3.5 px-4 align-middle leading-5">
                         <div className="space-y-1.5">
                           {item.shift2Items.map((s, i) => (
                             <div key={i} className="flex items-center gap-2">
@@ -401,7 +398,7 @@ export default function PlanningProductionPage() {
                       </td>
 
                       {/* Shift 3 */}
-                      <td className="py-4 px-3.5 align-middle">
+                      <td className="py-3.5 px-4 align-middle leading-5">
                         <div className="space-y-1.5">
                           {item.shift3Items.map((s, i) => (
                             <div key={i} className="flex items-center gap-2">
@@ -411,7 +408,7 @@ export default function PlanningProductionPage() {
                           ))}
                         </div>
                       </td>
-                      <td className="py-4 px-3.5 align-middle">
+                      <td className="py-3.5 px-4 align-middle leading-5">
                         <div className="space-y-1.5">
                           {item.shift3Items.map((s, i) => (
                             <div key={i} className="flex items-center gap-2">
@@ -422,13 +419,13 @@ export default function PlanningProductionPage() {
                         </div>
                       </td>
 
-                      {/* Action matching screenshot */}
-                      <td className="py-4 px-3.5 align-middle">
+                      {/* Action */}
+                      <td className="py-3.5 px-4 align-middle text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(item)}
-                            className="w-8 h-8 rounded-lg border border-[#FEDF89] hover:border-[#FDB022] text-[#F79009] hover:bg-amber-50 flex items-center justify-center transition-colors cursor-pointer bg-white shadow-2xs"
+                            className="p-1.5 border border-amber-300 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"
                             title="Edit Plan"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
@@ -436,7 +433,7 @@ export default function PlanningProductionPage() {
                           <button
                             type="button"
                             onClick={() => setDeletePlanId(item.id)}
-                            className="w-8 h-8 rounded-lg border border-[#FDA29B] hover:border-[#F04438] text-[#F04438] hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer bg-white shadow-2xs"
+                            className="p-1.5 border border-red-200 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete Plan"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -515,22 +512,22 @@ export default function PlanningProductionPage() {
 
       {/* Delete Confirmation Modal */}
       {deletePlanId && (
-        <ModalPortal>
-          <div className="bg-white rounded-xl shadow-2xl border border-gray-100 w-full max-w-sm p-5 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <h3 className="text-base font-bold text-[#1E232F]">Delete Production Plan?</h3>
+        <ModalPortal isOpen={!!deletePlanId} onClose={() => setDeletePlanId(null)}>
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
+            <h3 className="text-base font-bold text-gray-900">Delete Production Plan?</h3>
             <p className="text-xs text-gray-500">
               Are you sure you want to delete this schedule period? This action cannot be undone.
             </p>
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+            <div className="flex items-center justify-center gap-3 pt-2">
               <button
                 onClick={() => setDeletePlanId(null)}
-                className="px-3.5 py-1.5 border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50"
+                className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteConfirm}
-                className="px-3.5 py-1.5 bg-[#F04438] hover:bg-[#D92D20] text-white rounded-lg text-xs font-semibold shadow-sm"
+                className="px-6 py-2.5 bg-[#F04438] hover:bg-[#D92D20] text-white rounded-lg text-sm font-medium shadow-sm transition-colors"
               >
                 Delete
               </button>
@@ -541,11 +538,14 @@ export default function PlanningProductionPage() {
 
       {/* Upload Data Modal */}
       {showUploadModal && (
-        <ModalPortal>
-          <div className="bg-white rounded-xl shadow-2xl border border-gray-100 w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-              <h3 className="text-base font-bold text-[#1E232F]">Upload Production Schedule</h3>
-              <button onClick={() => setShowUploadModal(false)} className="text-gray-400 hover:text-gray-600">
+        <ModalPortal isOpen={showUploadModal} onClose={() => setShowUploadModal(false)}>
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Upload Production Schedule</h3>
+                <p className="text-xs text-gray-400 mt-0.5">This field is for desc terms of service</p>
+              </div>
+              <button onClick={() => setShowUploadModal(false)} className="text-gray-400 hover:text-gray-600 transition-colors p-1">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -558,17 +558,17 @@ export default function PlanningProductionPage() {
                 <input type="file" accept=".xlsx,.xls,.csv" className="hidden" />
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100">
+              <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(false)}
-                  className="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-xs font-medium"
+                  className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-xs font-semibold shadow-sm"
+                  className="px-6 py-2.5 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-sm font-medium shadow-sm transition-colors"
                 >
                   Import Data
                 </button>

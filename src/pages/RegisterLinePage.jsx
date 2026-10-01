@@ -7,11 +7,13 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   ArrowUpDown,
   Cpu
 } from 'lucide-react';
 import AntDateRangePicker from '../components/AntDateRangePicker';
 import ModalPortal from '../components/ModalPortal';
+import CustomDropdown from '../components/CustomDropdown';
 import Toast from '../components/Toast';
 import { INITIAL_REGISTERS, INITIAL_LINES, INITIAL_MACHINES } from '../data/mockData';
 
@@ -25,8 +27,7 @@ export default function RegisterLinePage() {
 
   // Form states
   const [selectedLine, setSelectedLine] = useState('');
-  const [selectedMachines, setSelectedMachines] = useState([]);
-  const [currentMachineSelect, setCurrentMachineSelect] = useState('');
+  const [selectedMachines, setSelectedMachines] = useState(['']);
   const [toast, setToast] = useState(null);
 
   // Pagination
@@ -48,38 +49,42 @@ export default function RegisterLinePage() {
 
   const handleOpenAdd = () => {
     setEditingRegister(null);
-    setSelectedLine(INITIAL_LINES[0]?.line || 'Line 1');
-    setSelectedMachines([INITIAL_MACHINES[0]?.machine || 'FANUC 1']);
-    setCurrentMachineSelect('');
+    setSelectedLine('');
+    setSelectedMachines(['']);
     setShowModal(true);
   };
 
   const handleOpenEdit = (r) => {
     setEditingRegister(r);
     setSelectedLine(r.line);
-    setSelectedMachines([...r.machines]);
-    setCurrentMachineSelect('');
+    setSelectedMachines(r.machines && r.machines.length > 0 ? [...r.machines] : ['']);
     setShowModal(true);
   };
 
-  const handleAddMachine = () => {
-    if (currentMachineSelect && !selectedMachines.includes(currentMachineSelect)) {
-      setSelectedMachines([...selectedMachines, currentMachineSelect]);
-      setCurrentMachineSelect('');
-    }
+  const handleAddMachineRow = () => {
+    setSelectedMachines([...selectedMachines, '']);
   };
 
-  const handleRemoveMachine = (machineToRemove) => {
-    setSelectedMachines(selectedMachines.filter((m) => m !== machineToRemove));
+  const handleMachineChange = (index, value) => {
+    const updated = [...selectedMachines];
+    updated[index] = value;
+    setSelectedMachines(updated);
+  };
+
+  const handleRemoveMachineRow = (index) => {
+    if (selectedMachines.length > 1) {
+      setSelectedMachines(selectedMachines.filter((_, idx) => idx !== index));
+    }
   };
 
   const handleSave = (e) => {
     e.preventDefault();
+    const validMachines = selectedMachines.filter((m) => m && m.trim() !== '');
     if (!selectedLine) {
       setToast({ type: 'error', title: 'Error', message: 'Please select a line.' });
       return;
     }
-    if (selectedMachines.length === 0) {
+    if (validMachines.length === 0) {
       setToast({ type: 'error', title: 'Error', message: 'Please select at least one machine.' });
       return;
     }
@@ -88,7 +93,7 @@ export default function RegisterLinePage() {
       setRegisters(
         registers.map((r) =>
           r.id === editingRegister.id
-            ? { ...r, line: selectedLine, machines: selectedMachines }
+            ? { ...r, line: selectedLine, machines: validMachines }
             : r
         )
       );
@@ -101,14 +106,14 @@ export default function RegisterLinePage() {
       const newRegister = {
         id: Date.now(),
         line: selectedLine,
-        machines: selectedMachines,
+        machines: validMachines,
         datetime: new Date().toLocaleDateString('en-GB') + ' 12:00'
       };
       setRegisters([newRegister, ...registers]);
       setToast({
         type: 'success',
         title: 'Line Registered',
-        message: `${selectedLine} registered with ${selectedMachines.length} machines.`
+        message: `${selectedLine} registered with ${validMachines.length} machines.`
       });
     }
     setShowModal(false);
@@ -127,82 +132,82 @@ export default function RegisterLinePage() {
   return (
     <>
       <div className="space-y-4">
-        {/* Top Header Card matching Figma exact Header */}
-        <div className="bg-white rounded-xl border border-[#E4E7EC] p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm flex-shrink-0">
-          <div>
-            <h1 className="text-xl font-bold text-[#1E232F]">Line</h1>
-            <p className="text-xs text-gray-500 mt-0.5">List Line data</p>
-          </div>
+        {/* Top Header Card */}
+        <div className="bg-white rounded-xl border border-[#E4E7EC] p-4 shadow-sm flex-shrink-0">
+          <h1 className="text-xl font-bold text-[#1E232F]">Line</h1>
+          <p className="text-xs text-gray-500 mt-0.5">List Line data</p>
+        </div>
 
-          <div className="flex items-center gap-3">
-            <div className="relative w-64">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        {/* Table Card */}
+        <div className="bg-white rounded-xl border border-[#E4E7EC] p-4 shadow-sm space-y-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="relative w-80">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search line or machine..."
-                className="w-full pl-9 pr-8 py-2 border border-gray-200 rounded-lg text-xs placeholder-gray-400 focus:outline-none focus:border-emerald-500"
+                className="w-full pl-10 pr-9 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-emerald-500"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-4 h-4" />
                 </button>
               )}
             </div>
 
-            <AntDateRangePicker
-              value={dateRange}
-              onChange={(dates) => setDateRange(dates)}
-            />
+            <div className="flex items-center gap-3">
+              <AntDateRangePicker
+                value={dateRange}
+                onChange={(dates) => setDateRange(dates)}
+              />
 
-            <button
-              onClick={handleOpenAdd}
-              className="flex items-center gap-1.5 px-4 py-2 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-xs font-semibold transition-colors shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Data</span>
-            </button>
+              <button
+                onClick={handleOpenAdd}
+                className="flex items-center gap-2 px-4 py-2 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Data</span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Table Card */}
-        <div className="bg-white rounded-xl border border-[#E4E7EC] p-4 shadow-sm space-y-4">
           <div className="overflow-x-auto rounded-lg border border-[#D0D5DD]">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full text-left border-collapse text-sm font-sans">
               <thead className="bg-[#F2F2F7] border-b border-[#D0D5DD]">
                 <tr className="text-[#23262B] font-semibold">
-                  <th className="py-3 px-4 w-16">
-                    <div className="flex items-center gap-1 cursor-pointer select-none">
+                  <th className="py-3.5 px-4 w-16">
+                    <div className="flex items-center gap-1.5 cursor-pointer select-none">
                       <span>No</span>
-                      <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                      <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
                     </div>
                   </th>
-                  <th className="py-3 px-4 w-44">
-                    <div className="flex items-center gap-1 cursor-pointer select-none">
+                  <th className="py-3.5 px-4 w-44">
+                    <div className="flex items-center gap-1.5 cursor-pointer select-none">
                       <span>Line</span>
-                      <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                      <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
                     </div>
                   </th>
-                  <th className="py-3 px-4">
-                    <div className="flex items-center gap-1 cursor-pointer select-none">
+                  <th className="py-3.5 px-4">
+                    <div className="flex items-center gap-1.5 cursor-pointer select-none">
                       <span>Machine</span>
-                      <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                      <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
                     </div>
                   </th>
-                  <th className="py-3 px-4 w-48">
-                    <div className="flex items-center gap-1 cursor-pointer select-none">
+                  <th className="py-3.5 px-4 w-48">
+                    <div className="flex items-center gap-1.5 cursor-pointer select-none">
                       <span>Datetime</span>
-                      <ArrowUpDown className="w-3 h-3 text-gray-400" />
+                      <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
                     </div>
                   </th>
-                  <th className="py-3 px-4 text-center w-24">Action</th>
+                  <th className="py-3.5 px-4 text-center w-24">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-[#E4E7EC] bg-white">
                 {paginatedRegisters.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="py-8 text-center text-gray-400">
@@ -211,14 +216,14 @@ export default function RegisterLinePage() {
                   </tr>
                 ) : (
                   paginatedRegisters.map((r, idx) => (
-                    <tr key={r.id} className="hover:bg-gray-50/60 transition-colors">
-                      <td className="py-3.5 px-4 text-gray-600 align-top">
+                    <tr key={r.id} className="hover:bg-gray-50/80 transition-colors">
+                      <td className="py-3.5 px-4 font-medium text-gray-600 align-top leading-5">
                         {(currentPage - 1) * itemsPerPage + idx + 1}
                       </td>
-                      <td className="py-3.5 px-4 font-semibold text-[#1E232F] align-top">
+                      <td className="py-3.5 px-4 font-medium text-gray-800 align-top leading-5">
                         {r.line}
                       </td>
-                      <td className="py-3.5 px-4 text-gray-700 align-top">
+                      <td className="py-3.5 px-4 text-gray-700 align-top leading-5">
                         <div className="space-y-1">
                           {r.machines.map((m, mIdx) => (
                             <div
@@ -230,21 +235,21 @@ export default function RegisterLinePage() {
                           ))}
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-gray-500 align-top">
+                      <td className="py-3.5 px-4 text-gray-600 align-top leading-5">
                         {r.datetime}
                       </td>
-                      <td className="py-3.5 px-4 align-top">
+                      <td className="py-3.5 px-4 align-top text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => handleOpenEdit(r)}
-                            className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors"
+                            className="p-1.5 border border-amber-300 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"
                             title="Edit"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => setDeleteId(r.id)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            className="p-1.5 border border-red-200 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -314,175 +319,142 @@ export default function RegisterLinePage() {
         </div>
       </div>
 
-      {/* Add / Edit Register Line Modal */}
-      {showModal && (
-        <ModalPortal>
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-gray-100 overflow-hidden transform transition-all">
-              <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-bold text-gray-900">
-                    {editingRegister ? 'Edit Register Line' : 'Register Line'}
-                  </h3>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    This field is for desc terms of service
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+      {/* Add / Edit Register Line Modal matching screenshots */}
+      <ModalPortal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 max-h-[90vh] flex flex-col">
+          <div className="flex items-start justify-between border-b border-gray-100 pb-3 flex-shrink-0">
+            <div>
+              <h3 className="text-base font-bold text-gray-900">
+                {editingRegister ? 'Edit Register Line' : 'Register Line'}
+              </h3>
+              <p className="text-xs text-gray-400 mt-0.5">
+                This field is for desc terms of service
+              </p>
+            </div>
+            <button
+              onClick={() => setShowModal(false)}
+              className="text-gray-400 hover:text-gray-600 p-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <form onSubmit={handleSave} className="space-y-4 flex-1 overflow-y-auto pr-1">
+            {/* Line Select */}
+            <div className="relative z-40">
+              <label className="block text-sm font-bold text-gray-900 mb-1.5">
+                Line
+              </label>
+              <CustomDropdown
+                value={selectedLine}
+                onChange={(val) => setSelectedLine(val)}
+                options={INITIAL_LINES}
+                placeholder="Select Line"
+                buttonClassName="h-11 rounded-xl"
+              />
+            </div>
+
+            {/* Add More Header Row */}
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-sm font-bold text-gray-900">Add More</span>
+              <button
+                type="button"
+                onClick={handleAddMachineRow}
+                className="w-8 h-8 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg flex items-center justify-center transition-colors shadow-xs cursor-pointer"
+                title="Add More Machine"
+              >
+                <Plus className="w-5 h-5 stroke-[2.5]" />
+              </button>
+            </div>
+
+            {/* Machine Select Rows */}
+            <div className="space-y-4">
+              {selectedMachines.map((mach, idx) => (
+                <div
+                  key={idx}
+                  className="space-y-1.5 relative"
+                  style={{ zIndex: 30 - idx }}
                 >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <form onSubmit={handleSave} className="p-6 space-y-4">
-                {/* Line Select */}
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                    Line
+                  <label className="block text-sm font-bold text-gray-900">
+                    Machine
                   </label>
-                  <select
-                    value={selectedLine}
-                    onChange={(e) => setSelectedLine(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-emerald-500 font-medium text-gray-800"
-                  >
-                    {INITIAL_LINES.map((l) => (
-                      <option key={l.id} value={l.line}>
-                        {l.line}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-[11px] text-gray-400 mt-1">
-                    Select target production line
-                  </p>
-                </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <CustomDropdown
+                        value={mach}
+                        onChange={(val) => handleMachineChange(idx, val)}
+                        options={INITIAL_MACHINES}
+                        placeholder="Select Machine"
+                        buttonClassName="h-11 rounded-xl"
+                      />
+                    </div>
 
-                {/* Machine Assignment */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold text-gray-700">
-                      Machine
-                    </label>
-                    <span className="text-[11px] text-gray-400">
-                      We’ll never share your details. See our Privacy Policy.
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2 mb-3">
-                    <select
-                      value={currentMachineSelect}
-                      onChange={(e) => setCurrentMachineSelect(e.target.value)}
-                      className="flex-1 px-3.5 py-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-emerald-500 font-medium text-gray-800"
-                    >
-                      <option value="">Select Machine to Add</option>
-                      {INITIAL_MACHINES.filter(
-                        (m) => !selectedMachines.includes(m.machine)
-                      ).map((m) => (
-                        <option key={m.id} value={m.machine}>
-                          {m.machine} ({m.model})
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      type="button"
-                      onClick={handleAddMachine}
-                      disabled={!currentMachineSelect}
-                      className="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed text-gray-700 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      Add More
-                    </button>
-                  </div>
-
-                  {/* Selected Machines Tags */}
-                  <div className="border border-gray-200 rounded-lg p-3 bg-gray-50/50 min-h-[90px] space-y-2">
-                    <p className="text-[11px] font-semibold text-gray-500">
-                      Assigned Machines ({selectedMachines.length}):
-                    </p>
-                    {selectedMachines.length === 0 ? (
-                      <p className="text-xs text-gray-400 italic">No machines assigned yet.</p>
-                    ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {selectedMachines.map((m) => (
-                          <span
-                            key={m}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-[#00A854]/30 rounded-md text-xs font-semibold text-[#00A854] shadow-xs"
-                          >
-                            <Cpu className="w-3 h-3 text-[#00A854]" />
-                            {m}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveMachine(m)}
-                              className="text-gray-400 hover:text-red-500 transition-colors ml-0.5"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </span>
-                        ))}
-                      </div>
+                    {/* Delete button: only shown when machines count > 1 */}
+                    {selectedMachines.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveMachineRow(idx)}
+                        className="p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0 cursor-pointer"
+                        title="Delete Machine"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
                     )}
                   </div>
-                  <p className="text-[11px] text-gray-400 mt-1">
-                    Assign one or more CNC machines to this line
-                  </p>
                 </div>
-
-                <div className="flex items-center justify-end gap-3 pt-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    className="px-4 py-2 border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-xs font-semibold transition-colors shadow-sm"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
+              ))}
             </div>
-          </div>
-        </ModalPortal>
-      )}
+
+            {/* Action Buttons with divider */}
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-6 py-2.5 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-sm font-medium shadow-sm transition-colors cursor-pointer"
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        </div>
+      </ModalPortal>
 
       {/* Delete Confirmation Modal */}
-      {deleteId && (
-        <ModalPortal>
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl border border-gray-100 p-6 space-y-4 text-center">
-              <div className="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto">
-                <Trash2 className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-gray-900">Delete Line Registration</h3>
-                <p className="text-xs text-gray-500 mt-1">
-                  Are you sure you want to delete this line registration? This action cannot be undone.
-                </p>
-              </div>
-              <div className="flex items-center justify-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setDeleteId(null)}
-                  className="px-4 py-2 border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDeleteConfirm}
-                  className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold transition-colors shadow-sm"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
+      <ModalPortal isOpen={!!deleteId} onClose={() => setDeleteId(null)}>
+        <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
+          <div className="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto">
+            <Trash2 className="w-6 h-6" />
           </div>
-        </ModalPortal>
-      )}
+          <div>
+            <h3 className="text-base font-bold text-gray-900">Delete Line Registration?</h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Are you sure you want to delete this line registration? This action cannot be undone.
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setDeleteId(null)}
+              className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleDeleteConfirm}
+              className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium shadow-sm"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </ModalPortal>
 
       {/* Toast Notification */}
       {toast && (

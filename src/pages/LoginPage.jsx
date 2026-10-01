@@ -41,12 +41,10 @@ export default function LoginPage({ onLoginSuccess }) {
         u.password === pTrim
     );
 
-    // Support convenient aliases like admin / admin123 or admin / admin
+    // Support convenient aliases like affan / affan12345 or admin / admin123
     if (!matched) {
-      if ((uTrim === 'admin' || uTrim === 'kevin') && (pTrim === 'admin123' || pTrim === 'admin' || pTrim === 'kevin12345')) {
-        matched = INITIAL_USERS[0]; // Kevin (Superadmin)
-      } else if ((uTrim === 'operator' || uTrim === 'suep') && (pTrim === 'operator123' || pTrim === 'operator' || pTrim === 'suep12345')) {
-        matched = INITIAL_USERS[1]; // Suep (Operator)
+      if ((uTrim === 'affan_astemo' || uTrim === 'affan' || uTrim === 'admin') && (pTrim === 'affan12345' || pTrim === 'admin123' || pTrim === 'admin')) {
+        matched = INITIAL_USERS[0]; // Affan Astemo (Superadmin)
       }
     }
 
@@ -183,42 +181,25 @@ export default function LoginPage({ onLoginSuccess }) {
             </button>
           </form>
 
-          {/* Akun Default Section - Simple neutral without colors */}
+          {/* Akun Default Section - Single default account */}
           <div className="w-full mt-6 pt-5 border-t border-[#E4E7EC] text-left">
             <p className="text-xs font-semibold text-gray-700 mb-3">
               Akun Default:
             </p>
 
-            <div className="space-y-2">
-              {/* kevin_astemo/kevin12345 */}
+            <div>
+              {/* affan_astemo/affan12345 */}
               <div className="flex items-center justify-between p-2.5 rounded-lg border border-gray-200 bg-gray-50 text-xs text-gray-700">
-                <span className="font-mono text-gray-800">kevin_astemo/kevin12345</span>
+                <span className="font-mono text-gray-800">affan_astemo/affan12345</span>
                 <button
                   type="button"
                   onClick={() => {
-                    setUsername('kevin_astemo');
-                    setPassword('kevin12345');
+                    setUsername('affan_astemo');
+                    setPassword('affan12345');
                     setIsInvalid(false);
                     setErrorMsg('');
                   }}
-                  className="text-xs font-semibold text-gray-600 hover:text-gray-900 hover:underline px-2 py-0.5"
-                >
-                  Gunakan
-                </button>
-              </div>
-
-              {/* suep_astemo/suep12345 */}
-              <div className="flex items-center justify-between p-2.5 rounded-lg border border-gray-200 bg-gray-50 text-xs text-gray-700">
-                <span className="font-mono text-gray-800">suep_astemo/suep12345</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setUsername('suep_astemo');
-                    setPassword('suep12345');
-                    setIsInvalid(false);
-                    setErrorMsg('');
-                  }}
-                  className="text-xs font-semibold text-gray-600 hover:text-gray-900 hover:underline px-2 py-0.5"
+                  className="text-xs font-semibold text-[#00A854] hover:text-[#008C45] hover:underline px-2 py-0.5"
                 >
                   Gunakan
                 </button>

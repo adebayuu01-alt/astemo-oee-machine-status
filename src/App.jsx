@@ -18,6 +18,7 @@ import {
   INITIAL_ROLES,
   INITIAL_NOTIFICATIONS
 } from './data/mockData';
+import { RealtimeProvider } from './context/RealtimeContext';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -46,8 +47,9 @@ export default function App() {
   };
 
   const handleNavigate = (menu) => {
-    // Suep (Operator) can only view Dashboard, Machine Status, Alarm History, Notification
-    const operatorAllowed = ['dashboard', 'machine-status', 'alarm-history', 'notification'];
+    if (menu === 'notification') return; // Notification hidden for now
+    // Suep (Operator) can only view Dashboard, Machine Status, Alarm History
+    const operatorAllowed = ['dashboard', 'machine-status', 'alarm-history'];
     if (isOperator && !operatorAllowed.includes(menu)) {
       return;
     }
@@ -64,69 +66,72 @@ export default function App() {
   }
 
   return (
-    <Layout
-      activeMenu={activeMenu}
-      onNavigate={handleNavigate}
-      onLogout={handleLogout}
-      currentUser={currentUser}
-      plcConnected={plcConnected}
-      onTogglePlc={togglePlc}
-      unreadCount={unreadCount}
-    >
-      {/* APPLICATION PAGES */}
-      {activeMenu === 'dashboard' && <DashboardPage />}
+    <RealtimeProvider>
+      <Layout
+        activeMenu={activeMenu}
+        onNavigate={handleNavigate}
+        onLogout={handleLogout}
+        currentUser={currentUser}
+        plcConnected={plcConnected}
+        onTogglePlc={togglePlc}
+        unreadCount={unreadCount}
+      >
+        {/* APPLICATION PAGES */}
+        {activeMenu === 'dashboard' && <DashboardPage />}
 
-      {activeMenu === 'machine-status' && (
-        <MachineStatusPage onNavigateAlarmHistory={() => handleNavigate('alarm-history')} />
-      )}
+        {activeMenu === 'machine-status' && (
+          <MachineStatusPage onNavigateAlarmHistory={() => handleNavigate('alarm-history')} />
+        )}
 
-      {activeMenu === 'alarm-history' && (
-        <AlarmHistoryPage onBack={() => handleNavigate('machine-status')} />
-      )}
+        {activeMenu === 'alarm-history' && (
+          <AlarmHistoryPage onBack={() => handleNavigate('machine-status')} />
+        )}
 
-      {(!isOperator || activeMenu === 'planning-production') && activeMenu === 'planning-production' && (
-        <PlanningProductionPage />
-      )}
+        {(!isOperator || activeMenu === 'planning-production') && activeMenu === 'planning-production' && (
+          <PlanningProductionPage />
+        )}
 
-      {activeMenu === 'notification' && (
-        <NotificationPage
-          notifications={notifications}
-          onUpdateNotifications={setNotifications}
-        />
-      )}
+        {/* Notification Page - Hidden for now */}
+        {/* activeMenu === 'notification' && (
+          <NotificationPage
+            notifications={notifications}
+            onUpdateNotifications={setNotifications}
+          />
+        ) */}
 
-      {/* MANAGEMENT PAGES (Superadmin & Admin) */}
-      {!isOperator && activeMenu === 'user-management' && (
-        <UserManagementPage
-          users={users}
-          onUpdateUsers={setUsers}
-          roles={roles}
-        />
-      )}
+        {/* MANAGEMENT PAGES (Superadmin & Admin) */}
+        {!isOperator && activeMenu === 'user-management' && (
+          <UserManagementPage
+            users={users}
+            onUpdateUsers={setUsers}
+            roles={roles}
+          />
+        )}
 
-      {!isOperator && activeMenu === 'role-management' && (
-        <RoleManagementPage
-          roles={roles}
-          onUpdateRoles={setRoles}
-        />
-      )}
+        {!isOperator && activeMenu === 'role-management' && (
+          <RoleManagementPage
+            roles={roles}
+            onUpdateRoles={setRoles}
+          />
+        )}
 
-      {/* DATABASE PAGES (Superadmin & Admin) */}
-      {!isOperator && activeMenu === 'master-data-line' && (
-        <MasterDataLinePage />
-      )}
+        {/* DATABASE PAGES (Superadmin & Admin) */}
+        {!isOperator && activeMenu === 'master-data-line' && (
+          <MasterDataLinePage />
+        )}
 
-      {!isOperator && activeMenu === 'master-data-machine' && (
-        <MasterDataMachinePage />
-      )}
+        {!isOperator && activeMenu === 'master-data-machine' && (
+          <MasterDataMachinePage />
+        )}
 
-      {!isOperator && activeMenu === 'master-data-shift' && (
-        <MasterDataShiftPage />
-      )}
+        {!isOperator && activeMenu === 'master-data-shift' && (
+          <MasterDataShiftPage />
+        )}
 
-      {!isOperator && activeMenu === 'register-line' && (
-        <RegisterLinePage />
-      )}
-    </Layout>
+        {!isOperator && activeMenu === 'register-line' && (
+          <RegisterLinePage />
+        )}
+      </Layout>
+    </RealtimeProvider>
   );
 }

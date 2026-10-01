@@ -21,7 +21,7 @@ import AntDateRangePicker from '../components/AntDateRangePicker';
 import CustomDropdown from '../components/CustomDropdown';
 import ModalPortal from '../components/ModalPortal';
 import Toast from '../components/Toast';
-import { TOP_5_ALARMS_DATA, PRODUCTION_GRAPH_DATA } from '../data/mockData';
+import { useRealtime } from '../context/RealtimeContext';
 
 // Register Chart.js elements
 ChartJS.register(
@@ -37,6 +37,14 @@ ChartJS.register(
 const SHIFT_OPTIONS = ['Shift 1', 'Shift 2', 'Shift 3'];
 
 export default function DashboardPage() {
+  const {
+    secondsLeft,
+    productData,
+    oeeMetrics,
+    top5Alarms,
+    productionGraph
+  } = useRealtime();
+
   const [selectedShift, setSelectedShift] = useState('Shift 1');
   const [dateRange, setDateRange] = useState(null);
   const [showTargetModal, setShowTargetModal] = useState(false);
@@ -46,11 +54,11 @@ export default function DashboardPage() {
 
   // Top 5 Alarm Chart Data (Horizontal Bar) - All bright blue bars matching screenshot
   const alarmChartData = {
-    labels: TOP_5_ALARMS_DATA.map((a) => a.name),
+    labels: top5Alarms.map((a) => a.name),
     datasets: [
       {
         label: 'Duration',
-        data: TOP_5_ALARMS_DATA.map((a) => a.hours),
+        data: top5Alarms.map((a) => a.hours),
         backgroundColor: '#2F80ED',
         hoverBackgroundColor: '#1E6AD1',
         borderRadius: 8,
@@ -64,6 +72,10 @@ export default function DashboardPage() {
     indexAxis: 'y',
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 600,
+      easing: 'easeOutQuart'
+    },
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -72,8 +84,8 @@ export default function DashboardPage() {
         cornerRadius: 6,
         callbacks: {
           label: (ctx) => {
-            const item = TOP_5_ALARMS_DATA[ctx.dataIndex];
-            return `Duration: ${item.duration}`;
+            const item = top5Alarms[ctx.dataIndex];
+            return `Duration: ${item?.duration || ''}`;
           }
         }
       }
@@ -135,11 +147,11 @@ export default function DashboardPage() {
 
   // Production Graph Data (Grouped Bar Actual vs Plan)
   const productionChartData = {
-    labels: PRODUCTION_GRAPH_DATA.labels,
+    labels: productionGraph.labels,
     datasets: [
       {
         label: 'Actual',
-        data: PRODUCTION_GRAPH_DATA.actual,
+        data: productionGraph.actual,
         backgroundColor: '#2F80ED',
         hoverBackgroundColor: '#1E6AD1',
         borderRadius: 4,
@@ -148,7 +160,7 @@ export default function DashboardPage() {
       },
       {
         label: 'Plan',
-        data: PRODUCTION_GRAPH_DATA.plan,
+        data: productionGraph.plan,
         backgroundColor: '#00A854',
         hoverBackgroundColor: '#008C45',
         borderRadius: 4,
@@ -161,6 +173,10 @@ export default function DashboardPage() {
   const productionChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 600,
+      easing: 'easeOutQuart'
+    },
     plugins: {
       legend: {
         position: 'bottom',
@@ -217,7 +233,7 @@ export default function DashboardPage() {
     labels: ['OK', 'Rework'],
     datasets: [
       {
-        data: [1156, 128],
+        data: [productData.okCount, productData.reworkCount],
         backgroundColor: ['#00A854', '#F04438'],
         borderWidth: 0,
         borderRadius: 12,
@@ -231,6 +247,10 @@ export default function DashboardPage() {
     responsive: true,
     maintainAspectRatio: false,
     cutout: '74%',
+    animation: {
+      duration: 600,
+      easing: 'easeOutQuart'
+    },
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -238,7 +258,7 @@ export default function DashboardPage() {
         padding: 8,
         cornerRadius: 6,
         callbacks: {
-          label: (ctx) => `${ctx.label}: ${ctx.raw} pcs (${Math.round((ctx.raw / 1284) * 100)}%)`
+          label: (ctx) => `${ctx.label}: ${ctx.raw} pcs (${Math.round((ctx.raw / (productData.totalParts || 1)) * 100)}%)`
         }
       }
     }
@@ -294,8 +314,8 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-gray-600">
                 Current OEE
               </p>
-              <h2 className="text-4xl font-extrabold text-[#1E232F] tracking-tight mt-1.5">
-                50%
+              <h2 className="text-4xl font-extrabold text-[#1E232F] tracking-tight mt-1.5 transition-all duration-300">
+                {oeeMetrics.actualOee}%
               </h2>
             </div>
             <div className="w-12 h-12 rounded-xl bg-[#00A854] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
@@ -309,8 +329,8 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-gray-600">
                 Production Target
               </p>
-              <h2 className="text-4xl font-extrabold text-[#1E232F] tracking-tight mt-1.5">
-                1284
+              <h2 className="text-4xl font-extrabold text-[#1E232F] tracking-tight mt-1.5 transition-all duration-300">
+                {productData.productionTarget.toLocaleString('id-ID')}
               </h2>
             </div>
             <div className="w-12 h-12 rounded-xl bg-[#00A854] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
@@ -324,8 +344,8 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-gray-600">
                 Counting Product
               </p>
-              <h2 className="text-4xl font-extrabold text-[#1E232F] tracking-tight mt-1.5">
-                1284
+              <h2 className="text-4xl font-extrabold text-[#1E232F] tracking-tight mt-1.5 transition-all duration-300">
+                {productData.countingProduct.toLocaleString('id-ID')}
               </h2>
             </div>
             <div className="w-12 h-12 rounded-xl bg-[#00A854] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
@@ -339,8 +359,8 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-gray-600">
                 Rasio Product OK
               </p>
-              <h2 className="text-4xl font-extrabold text-[#1E232F] tracking-tight mt-1.5">
-                90%
+              <h2 className="text-4xl font-extrabold text-[#1E232F] tracking-tight mt-1.5 transition-all duration-300">
+                {productData.ratioProductOk}%
               </h2>
             </div>
             <div className="w-12 h-12 rounded-xl bg-[#00A854] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
@@ -411,12 +431,12 @@ export default function DashboardPage() {
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
                   <span className="text-[#1E232F]">Actual OEE</span>
-                  <span className="text-[#1E232F] font-bold">50%</span>
+                  <span className="text-[#1E232F] font-bold transition-all duration-300">{oeeMetrics.actualOee}%</span>
                 </div>
                 <div className="w-full bg-[#F2F4F7] h-3 rounded-full overflow-hidden">
                   <div
-                    className="bg-[#00A854] h-full rounded-full transition-all duration-500"
-                    style={{ width: '50%' }}
+                    className="bg-[#00A854] h-full rounded-full transition-all duration-700 ease-out"
+                    style={{ width: `${oeeMetrics.actualOee}%` }}
                   />
                 </div>
               </div>
@@ -425,11 +445,11 @@ export default function DashboardPage() {
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
                   <span className="text-[#1E232F]">Target OEE</span>
-                  <span className="text-[#1E232F] font-bold">{targetOee}%</span>
+                  <span className="text-[#1E232F] font-bold transition-all duration-300">{targetOee}%</span>
                 </div>
                 <div className="w-full bg-[#F2F4F7] h-3 rounded-full overflow-hidden">
                   <div
-                    className="bg-[#2F80ED] h-full rounded-full transition-all duration-500"
+                    className="bg-[#2F80ED] h-full rounded-full transition-all duration-700 ease-out"
                     style={{ width: `${Math.min(targetOee, 100)}%` }}
                   />
                 </div>
@@ -439,12 +459,12 @@ export default function DashboardPage() {
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
                   <span className="text-[#1E232F]">Avaibility</span>
-                  <span className="text-[#1E232F] font-bold">50%</span>
+                  <span className="text-[#1E232F] font-bold transition-all duration-300">{oeeMetrics.availability}%</span>
                 </div>
                 <div className="w-full bg-[#F2F4F7] h-3 rounded-full overflow-hidden">
                   <div
-                    className="bg-[#FA8C16] h-full rounded-full transition-all duration-500"
-                    style={{ width: '50%' }}
+                    className="bg-[#FA8C16] h-full rounded-full transition-all duration-700 ease-out"
+                    style={{ width: `${oeeMetrics.availability}%` }}
                   />
                 </div>
               </div>
@@ -453,12 +473,12 @@ export default function DashboardPage() {
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
                   <span className="text-[#1E232F]">Performance</span>
-                  <span className="text-[#1E232F] font-bold">80%</span>
+                  <span className="text-[#1E232F] font-bold transition-all duration-300">{oeeMetrics.performance}%</span>
                 </div>
                 <div className="w-full bg-[#F2F4F7] h-3 rounded-full overflow-hidden">
                   <div
-                    className="bg-[#722ED1] h-full rounded-full transition-all duration-500"
-                    style={{ width: '80%' }}
+                    className="bg-[#722ED1] h-full rounded-full transition-all duration-700 ease-out"
+                    style={{ width: `${oeeMetrics.performance}%` }}
                   />
                 </div>
               </div>
@@ -467,12 +487,12 @@ export default function DashboardPage() {
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1.5">
                   <span className="text-[#1E232F]">Quality</span>
-                  <span className="text-[#1E232F] font-bold">20%</span>
+                  <span className="text-[#1E232F] font-bold transition-all duration-300">{oeeMetrics.quality}%</span>
                 </div>
                 <div className="w-full bg-[#F2F4F7] h-3 rounded-full overflow-hidden">
                   <div
-                    className="bg-[#F04438] h-full rounded-full transition-all duration-500"
-                    style={{ width: '20%' }}
+                    className="bg-[#F04438] h-full rounded-full transition-all duration-700 ease-out"
+                    style={{ width: `${oeeMetrics.quality}%` }}
                   />
                 </div>
               </div>
@@ -492,7 +512,9 @@ export default function DashboardPage() {
                 <Doughnut data={donutChartData} options={donutChartOptions} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   <span className="text-xs text-gray-500 font-medium">Total</span>
-                  <span className="text-3xl font-extrabold text-[#1E232F] tracking-tight">1284</span>
+                  <span className="text-3xl font-extrabold text-[#1E232F] tracking-tight transition-all duration-300">
+                    {productData.totalParts.toLocaleString('id-ID')}
+                  </span>
                 </div>
               </div>
 
@@ -504,8 +526,12 @@ export default function DashboardPage() {
                     <span className="font-semibold text-gray-800">OK</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-extrabold text-[#1E232F] leading-none">90%</p>
-                    <p className="text-xs font-semibold text-gray-600 mt-1">1284 pcs)</p>
+                    <p className="text-2xl font-extrabold text-[#1E232F] leading-none transition-all duration-300">
+                      {productData.ratioProductOk}%
+                    </p>
+                    <p className="text-xs font-semibold text-gray-600 mt-1 transition-all duration-300">
+                      ({productData.okCount.toLocaleString('id-ID')} pcs)
+                    </p>
                   </div>
                 </div>
 
@@ -515,8 +541,12 @@ export default function DashboardPage() {
                     <span className="font-semibold text-gray-800">Rework</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-extrabold text-[#1E232F] leading-none">10%</p>
-                    <p className="text-xs font-semibold text-gray-600 mt-1">(128 pcs)</p>
+                    <p className="text-2xl font-extrabold text-[#1E232F] leading-none transition-all duration-300">
+                      {productData.ratioProductRework}%
+                    </p>
+                    <p className="text-xs font-semibold text-gray-600 mt-1 transition-all duration-300">
+                      ({productData.reworkCount.toLocaleString('id-ID')} pcs)
+                    </p>
                   </div>
                 </div>
               </div>

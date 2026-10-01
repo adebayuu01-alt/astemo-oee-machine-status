@@ -31,6 +31,7 @@ export default function MasterDataModelPage({ models, onUpdateModels }) {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [deleteId, setDeleteId] = useState(null);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -128,10 +129,11 @@ export default function MasterDataModelPage({ models, onUpdateModels }) {
     setSpeedVal('');
   };
 
-  const handleDeleteModel = (id) => {
-    if (window.confirm('Are you sure you want to delete this model?')) {
-      onUpdateModels(models.filter((m) => m.id !== id));
+  const handleDeleteConfirm = () => {
+    if (deleteId) {
+      onUpdateModels(models.filter((m) => m.id !== deleteId));
       setToast({ type: 'success', title: 'Deleted', message: 'Model deleted successfully.' });
+      setDeleteId(null);
     }
   };
 
@@ -186,9 +188,9 @@ export default function MasterDataModelPage({ models, onUpdateModels }) {
             <SkeletonTable rows={5} cols={7} />
           ) : (
             <div className="overflow-x-auto rounded-lg border border-[#D0D5DD]">
-              <table className="w-full text-left border-collapse text-sm">
+              <table className="w-full text-left border-collapse text-sm font-sans">
                 <thead className="bg-[#F2F2F7] border-b border-[#D0D5DD]">
-                  <tr className="text-[#23262B] font-semibold text-xs">
+                  <tr className="text-[#23262B] font-semibold text-sm">
                     <th className="py-3.5 px-4 w-14">
                       <div className="flex items-center gap-1 cursor-pointer select-none">
                         <span>No</span>
@@ -239,25 +241,25 @@ export default function MasterDataModelPage({ models, onUpdateModels }) {
                         : '84.5';
                     return (
                       <tr key={m.id} className="hover:bg-gray-50/80 transition-colors">
-                        <td className="py-3.5 px-4 text-gray-600 font-medium">
+                        <td className="py-3.5 px-4 text-gray-600 font-medium text-sm leading-5">
                           {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
-                        <td className="py-3.5 px-4 text-gray-900 font-semibold">
+                        <td className="py-3.5 px-4 text-gray-900 font-semibold text-sm leading-5">
                           {m.model}
                         </td>
-                        <td className="py-3.5 px-4 text-emerald-700 font-semibold">
+                        <td className="py-3.5 px-4 text-emerald-700 font-semibold text-sm leading-5">
                           {strokeDisplay} mm
                         </td>
-                        <td className="py-3.5 px-4 text-gray-700 font-medium">
+                        <td className="py-3.5 px-4 text-gray-700 font-medium text-sm leading-5">
                           {m.angle ?? 45}°
                         </td>
-                        <td className="py-3.5 px-4 text-gray-700 font-medium">
+                        <td className="py-3.5 px-4 text-gray-700 font-medium text-sm leading-5">
                           {m.speed ?? 500} mm/min
                         </td>
-                        <td className="py-3.5 px-4 text-gray-500 text-xs">
+                        <td className="py-3.5 px-4 text-gray-600 text-sm leading-5">
                           {m.datetime}
                         </td>
-                        <td className="py-3.5 px-4 text-center">
+                        <td className="py-3.5 px-4 text-center leading-5">
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => handleOpenEdit(m)}
@@ -267,7 +269,7 @@ export default function MasterDataModelPage({ models, onUpdateModels }) {
                               <Edit2 className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => handleDeleteModel(m.id)}
+                              onClick={() => setDeleteId(m.id)}
                               className="p-1.5 border border-red-200 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                               title="Delete Model"
                             >
@@ -347,7 +349,7 @@ export default function MasterDataModelPage({ models, onUpdateModels }) {
                 {editingModel ? 'Edit Model' : 'Add Model'}
               </h3>
               <p className="text-xs text-gray-400 mt-0.5">
-                Setting parameter model untuk digunakan operator saat pengujian
+                This field is for desc terms of service
               </p>
             </div>
             <button
@@ -437,6 +439,30 @@ export default function MasterDataModelPage({ models, onUpdateModels }) {
               </button>
             </div>
           </form>
+        </div>
+      </ModalPortal>
+
+      {/* Delete Confirmation Modal */}
+      <ModalPortal isOpen={!!deleteId} onClose={() => setDeleteId(null)}>
+        <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
+          <h3 className="text-base font-bold text-gray-900">Delete Model?</h3>
+          <p className="text-xs text-gray-500">
+            Are you sure you want to delete this model? This action cannot be undone.
+          </p>
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <button
+              onClick={() => setDeleteId(null)}
+              className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteConfirm}
+              className="px-6 py-2.5 bg-[#F04438] hover:bg-[#D92D20] text-white rounded-lg text-sm font-medium shadow-sm transition-colors"
+            >
+              Delete
+            </button>
+          </div>
         </div>
       </ModalPortal>
 

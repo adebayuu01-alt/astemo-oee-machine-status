@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import AntDateRangePicker from '../components/AntDateRangePicker';
 import CustomDropdown from '../components/CustomDropdown';
 import AlarmHistoryPage from './AlarmHistoryPage';
+import { useRealtime } from '../context/RealtimeContext';
 
 const SHIFT_OPTIONS = ['Shift 1', 'Shift 2', 'Shift 3'];
 
@@ -244,6 +245,7 @@ function generateDummyTimeline(startDate, endDate, machineId) {
 }
 
 export default function MachineStatusPage({ onNavigateAlarmHistory }) {
+  const { tick } = useRealtime();
   const [currentView, setCurrentView] = useState('status'); // 'status' | 'alarm-history'
   const [selectedShift, setSelectedShift] = useState('Shift 1');
   const [dateRange, setDateRange] = useState(null);
@@ -412,46 +414,51 @@ export default function MachineStatusPage({ onNavigateAlarmHistory }) {
     }
   };
 
-  // Compute active machine timeline data dynamically based on dateRange or selectedShift
+  // Compute active machine timeline data dynamically based on dateRange, selectedShift, and realtime tick
   const activeMachines = useMemo(() => {
     return BASE_MACHINES.map((m) => {
+      let baseSegs;
       // 1. If custom Date & Time range is selected by the user
       if (dateRange && dateRange[0] && dateRange[1]) {
-        const segs = generateDummyTimeline(dateRange[0], dateRange[1], m.id);
-        const formatStr = !dateRange[0].isSame(dateRange[1], 'day') ? 'DD/MM HH:mm' : 'HH:mm';
-        return {
-          id: m.id,
-          name: m.name,
-          subtitle: `Status of ${m.name.toLowerCase()} (${dateRange[0].format(formatStr)} - ${dateRange[1].format(formatStr)})`,
-          segments: segs
-        };
+        baseSegs = generateDummyTimeline(dateRange[0], dateRange[1], m.id);
+      } else if (selectedShift === 'Shift 1' && m.id === 1) {
+        baseSegs = TIMELINE_SEGMENTS_F1;
+      } else {
+        const cfg = SHIFT_CONFIG[selectedShift] || SHIFT_CONFIG['Shift 1'];
+        const today = dayjs();
+        const start = today.hour(cfg.startH).minute(cfg.startM).second(0);
+        const end = today.hour(cfg.endH).minute(cfg.endM).second(0);
+        baseSegs = generateDummyTimeline(start, end, m.id);
       }
 
-      // 2. If Shift 1 and Machine 1, preserve the exact screenshot baseline segments
-      if (selectedShift === 'Shift 1' && m.id === 1) {
-        return {
-          id: m.id,
-          name: m.name,
-          subtitle: `Status of ${m.name.toLowerCase()}`,
-          segments: TIMELINE_SEGMENTS_F1
-        };
-      }
+      // Live animated timeline: the active segment slightly advances on each 10s tick
+      const lastIdx = baseSegs.length - 1;
+      const segs = baseSegs.map((s, idx) => {
+        if (idx === lastIdx) {
+          const stepBonus = (tick % 5) * 0.4;
+          const baseW = parseFloat(s.width) || 1.2;
+          return {
+            ...s,
+            width: `${(baseW + stepBonus).toFixed(1)}%`,
+            isLiveActive: true
+          };
+        }
+        return s;
+      });
 
-      // 3. For other machines or shifts, generate shift-based dummy segments
-      const cfg = SHIFT_CONFIG[selectedShift] || SHIFT_CONFIG['Shift 1'];
-      const today = dayjs();
-      const start = today.hour(cfg.startH).minute(cfg.startM).second(0);
-      const end = today.hour(cfg.endH).minute(cfg.endM).second(0);
-      const segs = generateDummyTimeline(start, end, m.id);
+      const formatStr = (dateRange && dateRange[0] && dateRange[1] && !dateRange[0].isSame(dateRange[1], 'day')) ? 'DD/MM HH:mm' : 'HH:mm';
+      const subtitle = (dateRange && dateRange[0] && dateRange[1])
+        ? `Status of ${m.name.toLowerCase()} (${dateRange[0].format(formatStr)} - ${dateRange[1].format(formatStr)})`
+        : `Status of ${m.name.toLowerCase()}`;
 
       return {
         id: m.id,
         name: m.name,
-        subtitle: `Status of ${m.name.toLowerCase()}`,
+        subtitle,
         segments: segs
       };
     });
-  }, [dateRange, selectedShift]);
+  }, [dateRange, selectedShift, tick]);
 
   if (currentView === 'alarm-history') {
     return <AlarmHistoryPage onBack={() => setCurrentView('status')} />;
@@ -509,7 +516,6 @@ export default function MachineStatusPage({ onNavigateAlarmHistory }) {
           {activeMachines.map((m) => {
             const currentZoom = getZoom(m.id);
             const machineTicks = getTimelineTicks(selectedShift, dateRange, currentZoom);
-
             return (
               <div
                 key={m.id}
@@ -612,9 +618,11 @@ export default function MachineStatusPage({ onNavigateAlarmHistory }) {
                               style={{ width: seg.width }}
                               onMouseEnter={(e) => handleSegmentMouseMove(e, seg)}
                               onMouseMove={(e) => handleSegmentMouseMove(e, seg)}
-                              className={`h-full relative transition-all cursor-pointer ${
+                              className={`h-full relative transition-all duration-700 ease-out cursor-pointer ${
                                 isGreen ? 'bg-[#00A854] hover:brightness-105' : 'bg-[#F04438] hover:brightness-105'
-                              } ${isFirst ? 'rounded-l-sm' : ''} ${isLast ? 'rounded-r-sm' : ''}`}
+                              } ${isFirst ? 'rounded-l-sm' : ''} ${
+                                isLast ? 'rounded-r-sm ring-2 ring-emerald-400/80 shadow-xs' : ''
+                              }`}
                             />
                           );
                         })}

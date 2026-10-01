@@ -13,8 +13,7 @@ import {
   LogOut,
   PanelLeftClose,
   PanelLeft,
-  MoreVertical,
-  Sun
+  MoreVertical
 } from 'lucide-react';
 import astemoBrand from '../assets/astemo-brand.png';
 import { INITIAL_NOTIFICATIONS } from '../data/mockData';
@@ -108,46 +107,11 @@ export default function Layout({
           </button>
         </div>
 
-        {/* Top Right: Sun, Bell & User Avatar matching Image 2 */}
-        <div className="flex items-center gap-4">
-          {/* Light / Dark Mode Toggle Icon */}
-          <button
-            type="button"
-            className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Theme Toggle"
-          >
-            <Sun className="w-5 h-5 text-gray-500" />
-          </button>
-
-          {/* Notification Bell */}
-          <button
-            type="button"
-            onClick={() => onNavigate('notification')}
-            className="relative p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Notifications"
-          >
-            <Bell className="w-5 h-5 text-gray-500" />
-            {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-            )}
-          </button>
-
-          {/* User Profile Avatar matching Image 2 */}
-          <div
-            className="flex items-center gap-2 cursor-pointer select-none pl-1"
-            title={`${currentUser?.name || 'User'} (${currentUser?.role || 'Guest'})`}
-          >
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold text-xs shadow-xs border border-white">
-              {currentUser?.name
-                ? currentUser.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')
-                    .slice(0, 2)
-                    .toUpperCase()
-                : 'KP'}
-            </div>
-          </div>
+        {/* Top Right: Realtime Date & Time matching user request */}
+        <div className="flex items-center gap-2.5 text-sm text-[#475467] font-medium select-none">
+          <span>{dateStr}</span>
+          <span className="text-gray-300">|</span>
+          <span className="font-bold text-[#1E232F]">{timeStr}</span>
         </div>
       </header>
 
@@ -211,26 +175,7 @@ export default function Layout({
                   {sidebarOpen && <span>Planning Production</span>}
                 </button>
 
-                {/* Notification */}
-                <button
-                  onClick={() => onNavigate('notification')}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                    activeMenu === 'notification'
-                      ? 'bg-[#EAF8F1] text-[#00A854] font-semibold'
-                      : 'text-[#475467] hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                  title="Notification"
-                >
-                  <div className="flex items-center gap-3">
-                    <Bell className="w-5 h-5 flex-shrink-0" />
-                    {sidebarOpen && <span>Notification</span>}
-                  </div>
-                  {sidebarOpen && unreadCount > 0 && (
-                    <span className="px-2 py-0.5 text-[11px] font-bold bg-[#F04438] text-white rounded-full">
-                      {unreadCount}
-                    </span>
-                  )}
-                </button>
+                {/* Notification (Hidden for now) */}
               </div>
             </div>
 

@@ -98,73 +98,73 @@ export default function MasterDataLinePage() {
   return (
     <>
       <div className="space-y-4">
-        {/* Top Header Card matching Figma exact Header */}
-        <div className="bg-white rounded-xl border border-[#E4E7EC] p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm flex-shrink-0">
-          <div>
-            <h1 className="text-xl font-bold text-[#1E232F]">Line</h1>
-            <p className="text-xs text-gray-500 mt-0.5">List line data</p>
-          </div>
+        {/* Top Header Card */}
+        <div className="bg-white rounded-xl border border-[#E4E7EC] p-4 shadow-sm flex-shrink-0">
+          <h1 className="text-xl font-bold text-[#1E232F]">Line</h1>
+          <p className="text-xs text-gray-500 mt-0.5">List line data</p>
+        </div>
 
-          <div className="flex items-center gap-3">
-            <div className="relative w-64">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        {/* Table Card */}
+        <div className="bg-white rounded-xl border border-[#E4E7EC] p-4 shadow-sm space-y-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="relative w-80">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search line..."
-                className="w-full pl-9 pr-8 py-2 border border-gray-200 rounded-lg text-xs placeholder-gray-400 focus:outline-none focus:border-emerald-500"
+                className="w-full pl-10 pr-9 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-emerald-500"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-4 h-4" />
                 </button>
               )}
             </div>
 
-            <AntDateRangePicker
-              value={dateRange}
-              onChange={(dates) => setDateRange(dates)}
-            />
+            <div className="flex items-center gap-3">
+              <AntDateRangePicker
+                value={dateRange}
+                onChange={(dates) => setDateRange(dates)}
+              />
 
-            <button
-              onClick={handleOpenAdd}
-              className="flex items-center gap-1.5 px-4 py-2 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-xs font-semibold transition-colors shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Data</span>
-            </button>
+              <button
+                onClick={handleOpenAdd}
+                className="flex items-center gap-2 px-4 py-2 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Data</span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Table Card */}
-        <div className="bg-white rounded-xl border border-[#E4E7EC] p-4 shadow-sm space-y-4">
           <div className="overflow-x-auto rounded-lg border border-[#D0D5DD]">
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full text-left border-collapse text-sm font-sans">
               <thead className="bg-[#F2F2F7] border-b border-[#D0D5DD]">
                 <tr className="text-[#23262B] font-semibold">
-                  <th className="py-3 px-4 w-16">
-                    <div className="flex items-center gap-1 cursor-pointer select-none">
+                  <th className="py-3.5 px-4 w-16">
+                    <div className="flex items-center gap-1.5 cursor-pointer select-none">
                       <span>No</span>
-                      <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
+                      <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
                     </div>
                   </th>
-                  <th className="py-3 px-4">
-                    <div className="flex items-center gap-1 cursor-pointer select-none">
+                  <th className="py-3.5 px-4">
+                    <div className="flex items-center gap-1.5 cursor-pointer select-none">
                       <span>Line</span>
-                      <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
+                      <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
                     </div>
                   </th>
-                  <th className="py-3 px-4 w-48">
-                    <div className="flex items-center gap-1 cursor-pointer select-none">
+                  <th className="py-3.5 px-4 w-48">
+                    <div className="flex items-center gap-1.5 cursor-pointer select-none">
                       <span>Datetime</span>
-                      <ArrowUpDown className="w-3.5 h-3.5 text-gray-400" />
+                      <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
                     </div>
                   </th>
-                  <th className="py-3 px-4 text-right w-24">Action</th>
+                  <th className="py-3.5 px-4 text-center w-24">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E4E7EC] bg-white">
@@ -177,20 +177,20 @@ export default function MasterDataLinePage() {
                 ) : (
                   paginatedLines.map((item, idx) => (
                     <tr key={item.id} className="hover:bg-gray-50/80 transition-colors">
-                      <td className="py-3.5 px-4 font-medium text-gray-600">
+                      <td className="py-3.5 px-4 font-medium text-gray-600 leading-5">
                         {(currentPage - 1) * itemsPerPage + idx + 1}
                       </td>
-                      <td className="py-3.5 px-4 font-semibold text-gray-800">
+                      <td className="py-3.5 px-4 font-medium text-gray-800 leading-5">
                         {item.line}
                       </td>
-                      <td className="py-3.5 px-4 text-gray-500 font-mono">
+                      <td className="py-3.5 px-4 text-gray-600 leading-5">
                         {item.datetime}
                       </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
+                      <td className="py-3.5 px-4 text-center">
+                        <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => handleOpenEdit(item)}
-                            className="p-1.5 border border-amber-300 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                            className="p-1.5 border border-amber-300 text-amber-500 hover:bg-amber-50 rounded-lg transition-colors"
                             title="Edit Line"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
@@ -264,76 +264,89 @@ export default function MasterDataLinePage() {
       </div>
 
       {/* Add / Edit Modal */}
-      {showModal && (
-        <ModalPortal>
-          <div className="bg-white rounded-xl shadow-2xl border border-gray-100 w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-              <h3 className="text-base font-bold text-[#1E232F]">
-                {editingLine ? 'Master Data - Edit Line' : 'Master Data - Add Line'}
+      <ModalPortal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+          <div className="flex items-start justify-between border-b border-gray-100 pb-3">
+            <div>
+              <h3 className="text-base font-bold text-gray-900">
+                {editingLine ? 'Edit Line' : 'Add Line'}
               </h3>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
-                <X className="w-5 h-5" />
-              </button>
+              <p className="text-xs text-gray-400 mt-0.5">
+                This field is for desc terms of service
+              </p>
+            </div>
+            <button
+              onClick={() => setShowModal(false)}
+              className="text-gray-400 hover:text-gray-600 p-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <form onSubmit={handleSave} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                Line Name
+              </label>
+              <input
+                type="text"
+                value={lineName}
+                onChange={(e) => setLineName(e.target.value)}
+                placeholder="Input Line Name (e.g. Line 1)"
+                className="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-500"
+                required
+              />
             </div>
 
-            <form onSubmit={handleSave} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-semibold text-gray-700 mb-1">Line Name</label>
-                <input
-                  type="text"
-                  value={lineName}
-                  onChange={(e) => setLineName(e.target.value)}
-                  placeholder="e.g. Line 1"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500 text-sm"
-                  required
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-gray-100">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg font-semibold shadow-sm"
-                >
-                  {editingLine ? 'Save Changes' : 'Add Line'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </ModalPortal>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {deleteId && (
-        <ModalPortal>
-          <div className="bg-white rounded-xl shadow-2xl border border-gray-100 w-full max-w-sm p-5 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <h3 className="text-base font-bold text-[#1E232F]">Delete Line?</h3>
-            <p className="text-xs text-gray-500">
-              Are you sure you want to delete this line from master data? This action cannot be undone.
-            </p>
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+            <div className="flex items-center justify-end gap-3 pt-3">
               <button
-                onClick={() => setDeleteId(null)}
-                className="px-3.5 py-1.5 border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50"
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium"
               >
                 Cancel
               </button>
               <button
-                onClick={handleDeleteConfirm}
-                className="px-3.5 py-1.5 bg-[#F04438] hover:bg-[#D92D20] text-white rounded-lg text-xs font-semibold shadow-sm"
+                type="submit"
+                className="px-6 py-2.5 bg-[#00A854] hover:bg-[#008C45] text-white rounded-lg text-sm font-medium shadow-sm"
               >
-                Delete
+                Save
               </button>
             </div>
+          </form>
+        </div>
+      </ModalPortal>
+
+      {/* Delete Confirmation Modal */}
+      <ModalPortal isOpen={!!deleteId} onClose={() => setDeleteId(null)}>
+        <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
+          <div className="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto">
+            <Trash2 className="w-6 h-6" />
           </div>
-        </ModalPortal>
-      )}
+          <div>
+            <h3 className="text-base font-bold text-gray-900">Delete Line?</h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Are you sure you want to delete this line from master data? This action cannot be undone.
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setDeleteId(null)}
+              className="px-5 py-2.5 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg text-sm font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleDeleteConfirm}
+              className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium shadow-sm"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </ModalPortal>
 
       {toast && (
         <Toast

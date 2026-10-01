@@ -175,81 +175,81 @@ export default function AlarmHistoryPage({ onBack }) {
           </div>
         </div>
 
-        {/* Data Table matching user screenshot with equal column widths */}
-        <div className="overflow-x-auto border border-[#EAECF0] rounded-lg">
-          <table className="w-full table-fixed text-left text-xs border-collapse">
+        {/* Data Table matching standard with equal column widths */}
+        <div className="overflow-x-auto border border-[#D0D5DD] rounded-lg">
+          <table className="w-full table-fixed text-left text-sm font-sans border-collapse">
             <thead>
-              <tr className="bg-[#F8F9FC] border-b border-[#EAECF0] text-gray-600 font-semibold select-none">
+              <tr className="bg-[#F2F2F7] border-b border-[#D0D5DD] text-[#23262B] font-semibold text-sm select-none">
                 <th
                   onClick={() => handleSort('no')}
-                  className="py-3 px-4 w-1/5 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="py-3.5 px-4 w-1/5 cursor-pointer hover:bg-gray-200/50 transition-colors"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>No</span>
-                    <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
+                    <ChevronsUpDown className="w-3.5 h-3.5 text-gray-500" />
                   </div>
                 </th>
                 <th
                   onClick={() => handleSort('code')}
-                  className="py-3 px-4 w-1/5 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="py-3.5 px-4 w-1/5 cursor-pointer hover:bg-gray-200/50 transition-colors"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Alarm Code</span>
-                    <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
+                    <ChevronsUpDown className="w-3.5 h-3.5 text-gray-500" />
                   </div>
                 </th>
                 <th
                   onClick={() => handleSort('message')}
-                  className="py-3 px-4 w-1/5 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="py-3.5 px-4 w-1/5 cursor-pointer hover:bg-gray-200/50 transition-colors"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Alarm Message</span>
-                    <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
+                    <ChevronsUpDown className="w-3.5 h-3.5 text-gray-500" />
                   </div>
                 </th>
                 <th
                   onClick={() => handleSort('duration')}
-                  className="py-3 px-4 w-1/5 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="py-3.5 px-4 w-1/5 cursor-pointer hover:bg-gray-200/50 transition-colors"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Duration</span>
-                    <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
+                    <ChevronsUpDown className="w-3.5 h-3.5 text-gray-500" />
                   </div>
                 </th>
                 <th
                   onClick={() => handleSort('timestamp')}
-                  className="py-3 px-4 w-1/5 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="py-3.5 px-4 w-1/5 cursor-pointer hover:bg-gray-200/50 transition-colors"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Timestamp</span>
-                    <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
+                    <ChevronsUpDown className="w-3.5 h-3.5 text-gray-500" />
                   </div>
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#EAECF0]">
+            <tbody className="divide-y divide-[#D0D5DD] bg-white">
               {paginatedData.length > 0 ? (
                 paginatedData.map((row) => (
                   <tr
                     key={row.no}
                     className="hover:bg-gray-50/70 transition-colors text-gray-800"
                   >
-                    <td className="py-3.5 px-4 font-medium text-gray-700">{row.no}</td>
-                    <td className="py-3.5 px-4 font-medium text-gray-900">{row.code}</td>
-                    <td className="py-3.5 px-4 text-gray-700 uppercase tracking-tight truncate" title={row.message}>
+                    <td className="py-3.5 px-4 font-medium text-gray-700 text-sm leading-5">{row.no}</td>
+                    <td className="py-3.5 px-4 font-medium text-gray-900 text-sm leading-5">{row.code}</td>
+                    <td className="py-3.5 px-4 text-gray-700 uppercase tracking-tight truncate text-sm leading-5" title={row.message}>
                       {row.message}
                     </td>
-                    <td className="py-3.5 px-4 text-gray-600 text-xs">
+                    <td className="py-3.5 px-4 text-gray-600 text-sm leading-5">
                       {row.duration}
                     </td>
-                    <td className="py-3.5 px-4 text-gray-600 text-xs">
+                    <td className="py-3.5 px-4 text-gray-600 text-sm leading-5">
                       {row.timestamp}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-gray-400">
+                  <td colSpan={5} className="py-12 text-center text-gray-400 text-sm">
                     No alarms found matching your filter criteria.
                   </td>
                 </tr>
