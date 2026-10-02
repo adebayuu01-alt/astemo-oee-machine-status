@@ -108,7 +108,7 @@ export default function Layout({
         </div>
 
         {/* Top Right: Realtime Date & Time matching user request */}
-        <div className="flex items-center gap-2.5 text-sm text-[#475467] font-medium select-none">
+        <div className="flex items-center gap-2.5 text-xl text-[#475467] font-medium select-none">
           <span>{dateStr}</span>
           <span className="text-gray-300">|</span>
           <span className="font-bold text-[#1E232F]">{timeStr}</span>
@@ -119,9 +119,8 @@ export default function Layout({
       <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Sidebar - Pinned stay, never scrolls with page content */}
         <aside
-          className={`${
-            sidebarOpen ? 'w-64' : 'w-20'
-          } h-full bg-white border-r border-[#E4E7EC] flex flex-col justify-between transition-all duration-300 ease-in-out select-none flex-shrink-0 z-20`}
+          className={`${sidebarOpen ? 'w-64' : 'w-20'
+            } h-full bg-white border-r border-[#E4E7EC] flex flex-col justify-between transition-all duration-300 ease-in-out select-none flex-shrink-0 z-20`}
         >
           {/* Menu Sections */}
           <div className="py-6 px-4 space-y-6 overflow-y-auto">
@@ -136,11 +135,10 @@ export default function Layout({
                 {/* Dashboard */}
                 <button
                   onClick={() => onNavigate('dashboard')}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                    activeMenu === 'dashboard'
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${activeMenu === 'dashboard'
                       ? 'bg-[#EAF8F1] text-[#00A854] font-semibold'
                       : 'text-[#475467] hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                    }`}
                   title="Dashboard"
                 >
                   <LayoutDashboard className="w-5 h-5 flex-shrink-0" />
@@ -150,11 +148,10 @@ export default function Layout({
                 {/* Machine Status */}
                 <button
                   onClick={() => onNavigate('machine-status')}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                    activeMenu === 'machine-status' || activeMenu === 'alarm-history'
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${activeMenu === 'machine-status' || activeMenu === 'alarm-history'
                       ? 'bg-[#EAF8F1] text-[#00A854] font-semibold'
                       : 'text-[#475467] hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                    }`}
                   title="Machine Status"
                 >
                   <Cpu className="w-5 h-5 flex-shrink-0" />
@@ -164,11 +161,10 @@ export default function Layout({
                 {/* Planning Production */}
                 <button
                   onClick={() => onNavigate('planning-production')}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                    activeMenu === 'planning-production'
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${activeMenu === 'planning-production'
                       ? 'bg-[#EAF8F1] text-[#00A854] font-semibold'
                       : 'text-[#475467] hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                    }`}
                   title="Planning Production"
                 >
                   <CalendarDays className="w-5 h-5 flex-shrink-0" />
@@ -242,11 +238,10 @@ export default function Layout({
                           onNavigate('master-data-line');
                         }
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                        isMasterDataActive
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isMasterDataActive
                           ? 'text-[#00A854] font-semibold'
                           : 'text-[#475467] hover:bg-gray-50'
-                      }`}
+                        }`}
                       title="Master Data"
                     >
                       <div className="flex items-center gap-3">
@@ -272,11 +267,10 @@ export default function Layout({
                           <div className="absolute left-[-16px] top-1/2 w-3.5 h-[1.5px] bg-[#D0D5DD] pointer-events-none" />
                           <button
                             onClick={() => onNavigate('master-data-line')}
-                            className={`w-full flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                              activeMenu === 'master-data-line'
+                            className={`w-full flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${activeMenu === 'master-data-line'
                                 ? 'bg-[#EAF8F1] text-[#00A854] font-semibold'
                                 : 'text-[#475467] hover:bg-gray-50 hover:text-gray-900'
-                            }`}
+                              }`}
                           >
                             <span>Line</span>
                           </button>
@@ -287,11 +281,10 @@ export default function Layout({
                           <div className="absolute left-[-16px] top-1/2 w-3.5 h-[1.5px] bg-[#D0D5DD] pointer-events-none" />
                           <button
                             onClick={() => onNavigate('master-data-machine')}
-                            className={`w-full flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                              activeMenu === 'master-data-machine'
+                            className={`w-full flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${activeMenu === 'master-data-machine'
                                 ? 'bg-[#EAF8F1] text-[#00A854] font-semibold'
                                 : 'text-[#475467] hover:bg-gray-50 hover:text-gray-900'
-                            }`}
+                              }`}
                           >
                             <span>Machine</span>
                           </button>
@@ -302,11 +295,10 @@ export default function Layout({
                           <div className="absolute left-[-16px] top-1/2 w-3.5 h-[1.5px] bg-[#D0D5DD] pointer-events-none" />
                           <button
                             onClick={() => onNavigate('master-data-shift')}
-                            className={`w-full flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                              activeMenu === 'master-data-shift'
+                            className={`w-full flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${activeMenu === 'master-data-shift'
                                 ? 'bg-[#EAF8F1] text-[#00A854] font-semibold'
                                 : 'text-[#475467] hover:bg-gray-50 hover:text-gray-900'
-                            }`}
+                              }`}
                           >
                             <span>Shift</span>
                           </button>
@@ -325,11 +317,10 @@ export default function Layout({
                           onNavigate('register-line');
                         }
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                        isRegisterActive
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isRegisterActive
                           ? 'text-[#00A854] font-semibold'
                           : 'text-[#475467] hover:bg-gray-50'
-                      }`}
+                        }`}
                       title="Register"
                     >
                       <div className="flex items-center gap-3">
@@ -355,11 +346,10 @@ export default function Layout({
                           <div className="absolute left-[-16px] top-1/2 w-3.5 h-[1.5px] bg-[#D0D5DD] pointer-events-none" />
                           <button
                             onClick={() => onNavigate('register-line')}
-                            className={`w-full flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                              activeMenu === 'register-line'
+                            className={`w-full flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${activeMenu === 'register-line'
                                 ? 'bg-[#EAF8F1] text-[#00A854] font-semibold'
                                 : 'text-[#475467] hover:bg-gray-50 hover:text-gray-900'
-                            }`}
+                              }`}
                           >
                             <span>Line</span>
                           </button>
